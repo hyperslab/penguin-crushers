@@ -1,10 +1,10 @@
 package com.penguincrushers;
 
 import com.google.inject.Provides;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,29 +35,76 @@ public class PenguinCrushersPlugin extends Plugin
 	private static final int CRUSHER_SOUTH_CENTER_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK03_NPC;
 	private static final int CRUSHER_NORTH_EAST_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK04_NPC;
 
-	// stepping stone that proceeds to the next obstacle; there are 2 matching the id so we also filter by coordinates
+	// stepping stone that leads to the next obstacle; there are 2 matching the id so we also filter by coordinates
 	private static final int CRUSHER_EXIT_PLATFORM_OBJECT_ID = ObjectID.PENG_AGILITY_CRUSHCOURSE_STEPSTONE01;
 	private static final WorldPoint CRUSHER_EXIT_PLATFORM_LOCATION = new WorldPoint(2630, 4057, 0);
 
-	@Getter
-	private final Set<NPC> southSideCrushers = new HashSet<>();
+	// so we wait one tick before updating the last crusher location values
+	private boolean locationsRecentlyUpdated = false;
+
+	private boolean locationsEverUpdated = false;
+
+	// crusher maps are <crusher, last position>
 
 	@Getter
-	private final Set<NPC> northWestCrushers = new HashSet<>();
+	private final Map<NPC, WorldPoint> southSideCrushers = new HashMap<>();
 
 	@Getter
-	private final Set<NPC> southCenterCrusher = new HashSet<>();
+	private final Map<NPC, WorldPoint> northWestCrushers = new HashMap<>();
 
 	@Getter
-	private final Set<NPC> northEastCrusher = new HashSet<>();
+	private final Map<NPC, WorldPoint> southCenterCrusher = new HashMap<>();
 
-	public Set<NPC> getCrushers()
+	@Getter
+	private final Map<NPC, WorldPoint> northEastCrusher = new HashMap<>();
+
+	public Map<NPC, WorldPoint> getSouthCrushers()
 	{
-		return Stream.of(southSideCrushers, northWestCrushers, southCenterCrusher, northEastCrusher).flatMap(Set::stream).collect(Collectors.toSet());
+		Map<NPC, WorldPoint> southCrushers = new HashMap<>();
+		southCrushers.putAll(southSideCrushers);
+		southCrushers.putAll(southCenterCrusher);
+		return southCrushers;
+	}
+
+	public Map<NPC, WorldPoint> getNorthCrushers()
+	{
+		Map<NPC, WorldPoint> northCrushers = new HashMap<>();
+		northCrushers.putAll(northWestCrushers);
+		northCrushers.putAll(northEastCrusher);
+		return northCrushers;
+	}
+
+	public Map<NPC, WorldPoint> getCrushers()
+	{
+		Map<NPC, WorldPoint> crushers = new HashMap<>();
+		crushers.putAll(southSideCrushers);
+		crushers.putAll(northWestCrushers);
+		crushers.putAll(southCenterCrusher);
+		crushers.putAll(northEastCrusher);
+		return crushers;
+	}
+
+	private void updateCrusherLastLocation(NPC crusher, WorldPoint lastLocation)
+	{
+		southSideCrushers.replace(crusher, lastLocation);
+		northWestCrushers.replace(crusher, lastLocation);
+		southCenterCrusher.replace(crusher, lastLocation);
+		northEastCrusher.replace(crusher, lastLocation);
 	}
 
 	@Getter
 	private final Set<TileObject> crusherExitPlatform = new HashSet<>();
+
+	private void clearData()
+	{
+		southSideCrushers.clear();
+		northWestCrushers.clear();
+		southCenterCrusher.clear();
+		northEastCrusher.clear();
+		crusherExitPlatform.clear();
+		locationsRecentlyUpdated = false;
+		locationsEverUpdated = false;
+	}
 
 	@Inject
 	private Client client;
@@ -81,6 +128,8 @@ public class PenguinCrushersPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
+		locationsRecentlyUpdated = false;
+		locationsEverUpdated = false;
 		log.debug("Penguin crushers started");
 	}
 
@@ -88,7 +137,7 @@ public class PenguinCrushersPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(overlay);
-		clearSets();
+		clearData();
 		log.debug("Penguin crushers stopped");
 	}
 
@@ -99,7 +148,7 @@ public class PenguinCrushersPlugin extends Plugin
 		{
 			case HOPPING:
 			case LOGIN_SCREEN:
-				clearSets();
+				clearData();
 				break;
 		}
 	}
@@ -107,9 +156,27 @@ public class PenguinCrushersPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-		if (isInCrusherZone())
+		// reset calculations if player is outside the crusher zone
+		if (!isInCrusherZone())
 		{
-			log.debug("Welcome to the crusher zone");
+			locationsRecentlyUpdated = false;
+			locationsEverUpdated = false;
+			return;
+		}
+
+		if (!locationsRecentlyUpdated)
+		{
+			for (NPC crusher : getCrushers().keySet())
+			{
+				updateCrusherLastLocation(crusher, crusher.getWorldLocation());
+			}
+			locationsRecentlyUpdated = true;
+		}
+
+		if (didCrushersJustMove())
+		{
+			locationsRecentlyUpdated = false;
+			locationsEverUpdated = true;
 		}
 	}
 
@@ -120,16 +187,16 @@ public class PenguinCrushersPlugin extends Plugin
 		switch (npc.getId())
 		{
 			case CRUSHER_SOUTH_SIDES_NPC_ID:
-				southSideCrushers.add(npc);
+				southSideCrushers.put(npc, npc.getWorldLocation());
 				break;
 			case CRUSHER_NORTH_WEST_NPC_ID:
-				northWestCrushers.add(npc);
+				northWestCrushers.put(npc, npc.getWorldLocation());
 				break;
 			case CRUSHER_SOUTH_CENTER_NPC_ID:
-				southCenterCrusher.add(npc);
+				southCenterCrusher.put(npc, npc.getWorldLocation());
 				break;
 			case CRUSHER_NORTH_EAST_NPC_ID:
-				northEastCrusher.add(npc);
+				northEastCrusher.put(npc, npc.getWorldLocation());
 				break;
 		}
 	}
@@ -161,7 +228,7 @@ public class PenguinCrushersPlugin extends Plugin
 		crusherExitPlatform.remove(tileObject);
 	}
 
-	private boolean isInCrusherZone()
+	public boolean isInCrusherZone()
 	{
 		Player local = client.getLocalPlayer();
 		if (local == null)
@@ -174,12 +241,23 @@ public class PenguinCrushersPlugin extends Plugin
 		return location.isInArea(CRUSHER_ZONE);
 	}
 
-	private void clearSets()
+	private boolean didCrushersJustMove()
 	{
-		southSideCrushers.clear();
-		northWestCrushers.clear();
-		southCenterCrusher.clear();
-		northEastCrusher.clear();
-		crusherExitPlatform.clear();
+		for (Map.Entry<NPC, WorldPoint> crusherAndLastLocation : getCrushers().entrySet())
+		{
+			NPC crusher = crusherAndLastLocation.getKey();
+			WorldPoint lastLocation = crusherAndLastLocation.getValue();
+			if (!crusher.getWorldLocation().equals(lastLocation))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean isSafeToCross()
+	{
+		return locationsEverUpdated && !didCrushersJustMove();
 	}
 }
