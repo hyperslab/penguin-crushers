@@ -149,7 +149,7 @@ public interface PenguinCrushersConfig extends Config
 	)
 	default Color endTileSafeColor()
 	{
-		return Color.GREEN;
+		return Color.BLUE;
 	}
 
 	@ConfigItem(

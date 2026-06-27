@@ -71,7 +71,7 @@ public class PenguinCrushersPlugin extends Plugin
 
 	// crusher maps are <crusher, last position>
 	// in theory tracking the types of crushers separately lets us predict exact movement patterns...
-	// but that might be too powerful even for this silly addon, so we generally treat them as indistinct for now
+	// but that might be too powerful even for this silly plugin, so we generally treat them as indistinct for now
 
 	@Getter
 	private final Map<NPC, WorldPoint> southSideCrushers = new HashMap<>();
