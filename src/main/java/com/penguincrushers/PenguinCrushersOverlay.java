@@ -4,15 +4,16 @@ import javax.inject.Inject;
 import java.awt.*;
 import java.util.Map;
 import java.util.Set;
-import net.runelite.api.Client;
-import net.runelite.api.NPC;
+
+import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.TileObject;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.util.ColorUtil;
 
 public class PenguinCrushersOverlay extends Overlay
 {
@@ -42,10 +43,23 @@ public class PenguinCrushersOverlay extends Overlay
 
         boolean safe = plugin.isSafeToCross();
 
+        String exitPlatformText = safe ? "Move now!" : "DON'T move!";
+        String startTileText = "Start here!";
+
         Color crusherTileColor = safe ? Color.CYAN : Color.RED;
         Color exitPlatformTileColor = safe ? Color.BLUE : Color.RED;
-        String exitPlatformText = safe ? "Move now!" : "DON'T move!";
         Color exitPlatformTextColor = safe ? Color.GREEN : Color.RED;
+        Color startTileColor = Color.GREEN;
+        Color startTileTextColor = Color.GREEN;
+        Color dangerTileColor = safe ? Color.YELLOW : Color.RED;
+        Color safeTileColor = Color.GREEN;
+
+        startTileColor = ColorUtil.colorWithAlpha(startTileColor, startTileColor.getAlpha() / 4);
+        dangerTileColor = ColorUtil.colorWithAlpha(dangerTileColor, dangerTileColor.getAlpha() / 5);
+        safeTileColor = ColorUtil.colorWithAlpha(safeTileColor, safeTileColor.getAlpha() / 5);
+
+        Stroke smallBorder = new BasicStroke(0.5f);
+        Stroke noBorder = new BasicStroke(0);
 
         Map<NPC, WorldPoint> crushers = plugin.getCrushers();
         for (NPC crusher : crushers.keySet())
@@ -70,6 +84,48 @@ public class PenguinCrushersOverlay extends Overlay
             if (textLocation != null)
             {
                 OverlayUtil.renderTextLocation(graphics, textLocation, exitPlatformText, exitPlatformTextColor);
+            }
+        }
+
+        LocalPoint startTileLocal = LocalPoint.fromWorld(client, PenguinCrushersPlugin.START_TILE_LOCATION);
+        if (startTileLocal != null)
+        {
+            Polygon tilePoly = Perspective.getCanvasTilePoly(client, startTileLocal);
+            if (tilePoly != null)
+            {
+                OverlayUtil.renderPolygon(graphics, tilePoly, startTileColor, startTileColor, smallBorder);
+            }
+
+            Point textLocation = Perspective.getCanvasTextLocation(client, graphics, startTileLocal, startTileText, 160);
+            if (textLocation != null)
+            {
+                OverlayUtil.renderTextLocation(graphics, textLocation, startTileText, startTileTextColor);
+            }
+        }
+
+        for (WorldPoint dangerTile : PenguinCrushersPlugin.DANGER_TILE_LOCATIONS)
+        {
+            LocalPoint dangerTileLocal = LocalPoint.fromWorld(client, dangerTile);
+            if (dangerTileLocal != null)
+            {
+                Polygon tilePoly = Perspective.getCanvasTilePoly(client, dangerTileLocal);
+                if (tilePoly != null)
+                {
+                    OverlayUtil.renderPolygon(graphics, tilePoly, dangerTileColor, dangerTileColor, smallBorder);
+                }
+            }
+        }
+
+        for (WorldPoint safeTile : PenguinCrushersPlugin.SAFE_TILE_LOCATIONS)
+        {
+            LocalPoint safeTileLocal = LocalPoint.fromWorld(client, safeTile);
+            if (safeTileLocal != null)
+            {
+                Polygon tilePoly = Perspective.getCanvasTilePoly(client, safeTileLocal);
+                if (tilePoly != null)
+                {
+                    OverlayUtil.renderPolygon(graphics, tilePoly, safeTileColor, safeTileColor, smallBorder);
+                }
             }
         }
 

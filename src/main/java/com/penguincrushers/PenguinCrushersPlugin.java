@@ -1,5 +1,6 @@
 package com.penguincrushers;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class PenguinCrushersPlugin extends Plugin
 	// area where the crusher obstacle takes place
 	private static final WorldArea CRUSHER_ZONE = new WorldArea(2628, 4054, 8, 4, 0);;
 
-	// 4 different types of crushers; crushers of the same time move at the same time
+	// 4 different types of crushers; crushers of the same type move at the same time
 	private static final int CRUSHER_SOUTH_SIDES_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK01_NPC;
 	private static final int CRUSHER_NORTH_WEST_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK02_NPC;
 	private static final int CRUSHER_SOUTH_CENTER_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK03_NPC;
@@ -39,12 +40,36 @@ public class PenguinCrushersPlugin extends Plugin
 	private static final int CRUSHER_EXIT_PLATFORM_OBJECT_ID = ObjectID.PENG_AGILITY_CRUSHCOURSE_STEPSTONE01;
 	private static final WorldPoint CRUSHER_EXIT_PLATFORM_LOCATION = new WorldPoint(2630, 4057, 0);
 
-	// so we wait one tick before updating the last crusher location values
+	// where the player appears after entering the crusher zone
+	public static final WorldPoint START_TILE_LOCATION = new WorldPoint(2635, 4055, 0);
+
+	// tiles where the crushers can deal damage to the player
+	public static final Set<WorldPoint> DANGER_TILE_LOCATIONS = ImmutableSet.of(
+			new WorldPoint(2634, 4055, 0),
+			new WorldPoint(2632, 4055, 0),
+			new WorldPoint(2630, 4055, 0),
+			new WorldPoint(2633, 4054, 0),
+			new WorldPoint(2631, 4054, 0),
+			new WorldPoint(2629, 4054, 0)
+	);
+
+	// tiles in between the danger tiles where the crushers cannot deal damage to the player
+	public static final Set<WorldPoint> SAFE_TILE_LOCATIONS = ImmutableSet.of(
+			new WorldPoint(2633, 4055, 0),
+			new WorldPoint(2631, 4055, 0),
+			new WorldPoint(2632, 4054, 0),
+			new WorldPoint(2630, 4054, 0)
+	);
+
+	// wait one tick after movement to update the last crusher location values
 	private boolean locationsRecentlyUpdated = false;
 
+	// not safe to cross until we've seen the crushers move at least once
 	private boolean locationsEverUpdated = false;
 
 	// crusher maps are <crusher, last position>
+	// in theory tracking the types of crushers separately lets us predict exact movement patterns...
+	// but that might be too powerful, so we generally treat them as indistinct for now
 
 	@Getter
 	private final Map<NPC, WorldPoint> southSideCrushers = new HashMap<>();
