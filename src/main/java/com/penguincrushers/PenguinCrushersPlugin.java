@@ -37,6 +37,8 @@ public class PenguinCrushersPlugin extends Plugin
 	private static final int CRUSHER_NORTH_EAST_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK04_NPC;
 
 	// stepping stone that leads to the next obstacle; there are 2 matching the id so we also filter by coordinates
+	// ultimately we didn't need to pull the object and could have just used the tile...
+	// but it took too much effort to get working, so I'm not removing it
 	private static final int CRUSHER_EXIT_PLATFORM_OBJECT_ID = ObjectID.PENG_AGILITY_CRUSHCOURSE_STEPSTONE01;
 	private static final WorldPoint CRUSHER_EXIT_PLATFORM_LOCATION = new WorldPoint(2630, 4057, 0);
 
@@ -45,20 +47,20 @@ public class PenguinCrushersPlugin extends Plugin
 
 	// tiles where the crushers can deal damage to the player
 	public static final Set<WorldPoint> DANGER_TILE_LOCATIONS = ImmutableSet.of(
-			new WorldPoint(2634, 4055, 0),
-			new WorldPoint(2632, 4055, 0),
-			new WorldPoint(2630, 4055, 0),
-			new WorldPoint(2633, 4054, 0),
-			new WorldPoint(2631, 4054, 0),
-			new WorldPoint(2629, 4054, 0)
+		new WorldPoint(2634, 4055, 0),
+		new WorldPoint(2632, 4055, 0),
+		new WorldPoint(2630, 4055, 0),
+		new WorldPoint(2633, 4054, 0),
+		new WorldPoint(2631, 4054, 0),
+		new WorldPoint(2629, 4054, 0)
 	);
 
 	// tiles in between the danger tiles where the crushers cannot deal damage to the player
 	public static final Set<WorldPoint> SAFE_TILE_LOCATIONS = ImmutableSet.of(
-			new WorldPoint(2633, 4055, 0),
-			new WorldPoint(2631, 4055, 0),
-			new WorldPoint(2632, 4054, 0),
-			new WorldPoint(2630, 4054, 0)
+		new WorldPoint(2633, 4055, 0),
+		new WorldPoint(2631, 4055, 0),
+		new WorldPoint(2632, 4054, 0),
+		new WorldPoint(2630, 4054, 0)
 	);
 
 	// wait one tick after movement to update the last crusher location values
@@ -69,7 +71,7 @@ public class PenguinCrushersPlugin extends Plugin
 
 	// crusher maps are <crusher, last position>
 	// in theory tracking the types of crushers separately lets us predict exact movement patterns...
-	// but that might be too powerful, so we generally treat them as indistinct for now
+	// but that might be too powerful even for this silly addon, so we generally treat them as indistinct for now
 
 	@Getter
 	private final Map<NPC, WorldPoint> southSideCrushers = new HashMap<>();
