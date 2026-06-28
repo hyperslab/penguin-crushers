@@ -3,7 +3,6 @@ package com.penguincrushers;
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.Map;
-import java.util.Set;
 
 import net.runelite.api.*;
 import net.runelite.api.Point;
@@ -75,10 +74,10 @@ public class PenguinCrushersOverlay extends Overlay
 
         if (config.highlightEndTile())
         {
-            Set<TileObject> exitPlatforms = plugin.getCrusherExitPlatform();
-            for (TileObject exitPlatform : exitPlatforms)
+            LocalPoint endTileLocal = LocalPoint.fromWorld(client, PenguinCrushersPlugin.END_TILE_LOCATION);
+            if (endTileLocal != null)
             {
-                Polygon tilePoly = exitPlatform.getCanvasTilePoly();
+                Polygon tilePoly = Perspective.getCanvasTilePoly(client, endTileLocal);
                 if (tilePoly != null)
                 {
                     OverlayUtil.renderPolygon(graphics, tilePoly, exitPlatformTileColor);
@@ -86,7 +85,7 @@ public class PenguinCrushersOverlay extends Overlay
 
                 if (config.showText())
                 {
-                    Point textLocation = exitPlatform.getCanvasTextLocation(graphics, exitPlatformText, 160);
+                    Point textLocation = Perspective.getCanvasTextLocation(client, graphics, endTileLocal, exitPlatformText, 160);
                     if (textLocation != null)
                     {
                         OverlayUtil.renderTextLocation(graphics, textLocation, exitPlatformText, exitPlatformTextColor);

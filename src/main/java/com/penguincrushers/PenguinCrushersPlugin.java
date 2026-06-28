@@ -3,7 +3,6 @@ package com.penguincrushers;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -36,14 +35,16 @@ public class PenguinCrushersPlugin extends Plugin
 	private static final int CRUSHER_SOUTH_CENTER_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK03_NPC;
 	private static final int CRUSHER_NORTH_EAST_NPC_ID = NpcID.PENG_AGILITY_CRUSHCOURSE_CRUSHBLOCK04_NPC;
 
-	// stepping stone that leads to the next obstacle; there are 2 matching the id so we also filter by coordinates
-	// ultimately we didn't need to pull the object and could have just used the tile...
-	// but it took too much effort to get working, so I'm not removing it
-	private static final int CRUSHER_EXIT_PLATFORM_OBJECT_ID = ObjectID.PENG_AGILITY_CRUSHCOURSE_STEPSTONE01;
-	private static final WorldPoint CRUSHER_EXIT_PLATFORM_LOCATION = new WorldPoint(2630, 4057, 0);
-
 	// where the player appears after entering the crusher zone
 	public static final WorldPoint START_TILE_LOCATION = new WorldPoint(2635, 4055, 0);
+
+	// tile of the stepping stone that leads to the next obstacle
+	public static final WorldPoint END_TILE_LOCATION = new WorldPoint(2630, 4057, 0);
+
+	// object ID of the stepping stone in case we ever need it
+	// we used to use it, but it was less buggy to just go straight to the tile
+	// there are 2 objects matching this ID so getting the usable one requires checking its location as well
+	private static final int CRUSHER_EXIT_PLATFORM_OBJECT_ID = ObjectID.PENG_AGILITY_CRUSHCOURSE_STEPSTONE01;
 
 	// tiles where the crushers can deal damage to the player
 	public static final Set<WorldPoint> DANGER_TILE_LOCATIONS = ImmutableSet.of(
@@ -119,16 +120,12 @@ public class PenguinCrushersPlugin extends Plugin
 		northEastCrusher.replace(crusher, lastLocation);
 	}
 
-	@Getter
-	private final Set<TileObject> crusherExitPlatform = new HashSet<>();
-
 	private void clearData()
 	{
 		southSideCrushers.clear();
 		northWestCrushers.clear();
 		southCenterCrusher.clear();
 		northEastCrusher.clear();
-		crusherExitPlatform.clear();
 		locationsRecentlyUpdated = false;
 		locationsEverUpdated = false;
 	}
@@ -236,23 +233,6 @@ public class PenguinCrushersPlugin extends Plugin
 		northWestCrushers.remove(npc);
 		southCenterCrusher.remove(npc);
 		northEastCrusher.remove(npc);
-	}
-
-	@Subscribe
-	public void onGameObjectSpawned(GameObjectSpawned gameObjectSpawned)
-	{
-		TileObject tileObject = gameObjectSpawned.getGameObject();
-		if (tileObject.getId() == CRUSHER_EXIT_PLATFORM_OBJECT_ID && tileObject.getWorldLocation().equals(CRUSHER_EXIT_PLATFORM_LOCATION))
-		{
-			crusherExitPlatform.add(tileObject);
-		}
-	}
-
-	@Subscribe
-	public void onGameObjectDespawned(GameObjectDespawned gameObjectDespawned)
-	{
-		TileObject tileObject = gameObjectDespawned.getGameObject();
-		crusherExitPlatform.remove(tileObject);
 	}
 
 	public boolean isInCrusherZone()
