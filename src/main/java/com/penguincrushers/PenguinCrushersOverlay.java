@@ -3,7 +3,6 @@ package com.penguincrushers;
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.Map;
-
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
