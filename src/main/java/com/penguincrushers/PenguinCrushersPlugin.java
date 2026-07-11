@@ -64,7 +64,7 @@ public class PenguinCrushersPlugin extends Plugin
 		new WorldPoint(2630, 4054, 0)
 	);
 
-	// wait one tick after movement to update the last crusher location values
+	// wait one tick after movement to update the last crusher and player location values
 	private boolean locationsRecentlyUpdated = false;
 
 	// not safe to cross until we've seen the crushers move at least once
@@ -120,6 +120,8 @@ public class PenguinCrushersPlugin extends Plugin
 		northEastCrusher.replace(crusher, lastLocation);
 	}
 
+	private WorldPoint lastPlayerLocation;
+
 	private void clearData()
 	{
 		southSideCrushers.clear();
@@ -128,6 +130,7 @@ public class PenguinCrushersPlugin extends Plugin
 		northEastCrusher.clear();
 		locationsRecentlyUpdated = false;
 		locationsEverUpdated = false;
+		lastPlayerLocation = null;
 	}
 
 	@Inject
@@ -154,6 +157,7 @@ public class PenguinCrushersPlugin extends Plugin
 		overlayManager.add(overlay);
 		locationsRecentlyUpdated = false;
 		locationsEverUpdated = false;
+		lastPlayerLocation = null;
 		log.debug("Penguin crushers started");
 	}
 
@@ -185,6 +189,7 @@ public class PenguinCrushersPlugin extends Plugin
 		{
 			locationsRecentlyUpdated = false;
 			locationsEverUpdated = false;
+			lastPlayerLocation = null;
 			return;
 		}
 
@@ -194,14 +199,18 @@ public class PenguinCrushersPlugin extends Plugin
 			{
 				updateCrusherLastLocation(crusher, crusher.getWorldLocation());
 			}
+			lastPlayerLocation = client.getLocalPlayer().getWorldLocation();
 			locationsRecentlyUpdated = true;
 		}
 
-		if (didCrushersJustMove())
+		if (didCrushersJustMove())  // kind of jank to tie player location tracking to crushers but w/e it works
 		{
 			locationsRecentlyUpdated = false;
 			locationsEverUpdated = true;
 		}
+
+		if (isPlayerCrossingSafely())
+			log.debug("you're safe!");
 	}
 
 	@Subscribe
@@ -266,5 +275,28 @@ public class PenguinCrushersPlugin extends Plugin
 	public boolean isSafeToCross()
 	{
 		return locationsEverUpdated && !didCrushersJustMove();
+	}
+
+	public boolean didPlayerJustMove()
+	{
+		return lastPlayerLocation != null && !lastPlayerLocation.equals(client.getLocalPlayer().getWorldLocation());
+	}
+
+	public boolean isPlayerCrossingSafely()
+	{
+		if (client.getLocalDestinationLocation() == null || client.getLocalPlayer() == null)
+		{
+			return false;
+		}
+
+		WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+		WorldPoint location = client.getLocalPlayer().getWorldLocation();
+
+		return didPlayerJustMove()
+				&& !destination.equals(location)
+				&& destination.isInArea(CRUSHER_ZONE)
+				&& DANGER_TILE_LOCATIONS.contains(location)
+				&& !DANGER_TILE_LOCATIONS.contains(destination)
+				&& !isSafeToCross();
 	}
 }
