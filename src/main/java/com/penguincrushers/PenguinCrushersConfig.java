@@ -195,4 +195,81 @@ public interface PenguinCrushersConfig extends Config
 	{
 		return Color.GREEN;
 	}
+
+	@ConfigItem(
+			keyName = "playSoundOnCorrectCrossing",
+			name = "Play sound on correct crossing",
+			description = "Play a sound effect when a successful crossing begins.",
+			position = 17
+	)
+	default boolean playSoundOnCorrectCrossing()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "changeColorsOnCorrectCrossing",
+			name = "Change colors on correct crossing",
+			description = "Change text and tile colors when a successful crossing begins.",
+			position = 18
+	)
+	default boolean changeColorsOnCorrectCrossing()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "endTileTextCorrectColor",
+			name = "End tile text correct color",
+			description = "Configures the color of the text above the end tile when crossing correctly.",
+			position = 19
+	)
+	default Color endTileTextCorrectColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "crusherTilesCorrectColor",
+			name = "Crusher tiles correct color",
+			description = "Configures the color of the crusher tile highlights when crossing correctly.",
+			position = 20
+	)
+	default Color crusherTilesCorrectColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "endTileCorrectColor",
+			name = "End tile correct color",
+			description = "Configures the color of the end tile highlight when crossing correctly.",
+			position = 21
+	)
+	default Color endTileCorrectColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "dangerTilesCorrectColor",
+			name = "Danger tiles correct color",
+			description = "Configures the color of the danger tile highlights when crossing correctly.",
+			position = 22
+	)
+	default Color dangerTilesCorrectColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "safeTilesCorrectColor",
+			name = "Safe tiles correct color",
+			description = "Configures the color of the safe tile highlights when crossing correctly.",
+			position = 22
+	)
+	default Color safeTilesCorrectColor()
+	{
+		return Color.CYAN;
+	}
 }

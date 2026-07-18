@@ -40,6 +40,7 @@ public class PenguinCrushersOverlay extends Overlay
         }
 
         boolean safe = plugin.isSafeToCross();
+        boolean correct = plugin.isPlayerCrossingSafely();
 
         String exitPlatformText = safe ? "Move now!" : "DON'T move!";
         String startTileText = "Start here!";
@@ -51,6 +52,16 @@ public class PenguinCrushersOverlay extends Overlay
         Color startTileColor = config.startTileColor();
         Color dangerTileColor = safe ? config.dangerTilesSafeColor() : config.dangerTilesDangerColor();
         Color safeTileColor = config.safeTilesColor();
+
+        if (config.changeColorsOnCorrectCrossing() && correct)
+        {
+            exitPlatformText = "Correct!";
+            exitPlatformTextColor = config.endTileTextCorrectColor();
+            crusherTileColor = config.crusherTilesCorrectColor();
+            exitPlatformTileColor = config.endTileCorrectColor();
+            dangerTileColor = config.dangerTilesCorrectColor();
+            safeTileColor = config.safeTilesCorrectColor();
+        }
 
         startTileColor = ColorUtil.colorWithAlpha(startTileColor, startTileColor.getAlpha() / 4);
         dangerTileColor = ColorUtil.colorWithAlpha(dangerTileColor, dangerTileColor.getAlpha() / 5);

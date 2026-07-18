@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -63,6 +64,9 @@ public class PenguinCrushersPlugin extends Plugin
 		new WorldPoint(2632, 4054, 0),
 		new WorldPoint(2630, 4054, 0)
 	);
+
+	// sound effect to play when the player starts crossing safely
+	private static final int SAFE_CROSSING_SOUND_EFFECT_ID = 98;  // low alchemy
 
 	// wait one tick after movement to update the last crusher and player location values
 	private boolean locationsRecentlyUpdated = false;
@@ -121,6 +125,10 @@ public class PenguinCrushersPlugin extends Plugin
 	}
 
 	private WorldPoint lastPlayerLocation;
+	private WorldPoint lastPlayerDestination;
+
+	private boolean playerOnDangerTrack = false;
+	private boolean playerOnSafeTrack = false;
 
 	private void clearData()
 	{
@@ -131,6 +139,9 @@ public class PenguinCrushersPlugin extends Plugin
 		locationsRecentlyUpdated = false;
 		locationsEverUpdated = false;
 		lastPlayerLocation = null;
+		lastPlayerDestination = null;
+		playerOnDangerTrack = false;
+		playerOnSafeTrack = false;
 	}
 
 	@Inject
@@ -158,6 +169,9 @@ public class PenguinCrushersPlugin extends Plugin
 		locationsRecentlyUpdated = false;
 		locationsEverUpdated = false;
 		lastPlayerLocation = null;
+		lastPlayerDestination = null;
+		playerOnDangerTrack = false;
+		playerOnSafeTrack = false;
 		log.debug("Penguin crushers started");
 	}
 
@@ -190,6 +204,8 @@ public class PenguinCrushersPlugin extends Plugin
 			locationsRecentlyUpdated = false;
 			locationsEverUpdated = false;
 			lastPlayerLocation = null;
+			lastPlayerDestination = null;
+			playerOnSafeTrack = false;
 			return;
 		}
 
@@ -200,6 +216,10 @@ public class PenguinCrushersPlugin extends Plugin
 				updateCrusherLastLocation(crusher, crusher.getWorldLocation());
 			}
 			lastPlayerLocation = client.getLocalPlayer().getWorldLocation();
+			if (client.getLocalDestinationLocation() != null)
+			{
+				lastPlayerDestination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+			}
 			locationsRecentlyUpdated = true;
 		}
 
@@ -209,8 +229,34 @@ public class PenguinCrushersPlugin extends Plugin
 			locationsEverUpdated = true;
 		}
 
-		if (isPlayerCrossingSafely())
-			log.debug("you're safe!");
+		if (!playerOnSafeTrack)
+		{
+			if (didPlayerStartCrossingSafely())
+			{
+				playerOnSafeTrack = true;
+				if (config.playSoundOnCorrectCrossing())
+				{
+					client.playSoundEffect(SAFE_CROSSING_SOUND_EFFECT_ID);
+				}
+			}
+		}
+		else
+		{
+			LocalPoint localDestination = client.getLocalDestinationLocation();
+			if (localDestination == null)
+			{
+				playerOnSafeTrack = didPlayerStartCrossingSafely();
+			}
+			else
+			{
+				WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+				WorldPoint location = client.getLocalPlayer().getWorldLocation();
+				if (destination.equals(location) || !destination.equals(lastPlayerDestination))
+				{
+					playerOnSafeTrack = didPlayerStartCrossingSafely();
+				}
+			}
+		}
 	}
 
 	@Subscribe
@@ -282,7 +328,7 @@ public class PenguinCrushersPlugin extends Plugin
 		return lastPlayerLocation != null && !lastPlayerLocation.equals(client.getLocalPlayer().getWorldLocation());
 	}
 
-	public boolean isPlayerCrossingSafely()
+	public boolean didPlayerStartCrossingSafely()
 	{
 		if (client.getLocalDestinationLocation() == null || client.getLocalPlayer() == null)
 		{
@@ -295,8 +341,13 @@ public class PenguinCrushersPlugin extends Plugin
 		return didPlayerJustMove()
 				&& !destination.equals(location)
 				&& destination.isInArea(CRUSHER_ZONE)
-				&& DANGER_TILE_LOCATIONS.contains(location)
 				&& !DANGER_TILE_LOCATIONS.contains(destination)
-				&& !isSafeToCross();
+				&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
+					|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross()));
+	}
+
+	public boolean isPlayerCrossingSafely()
+	{
+		return playerOnSafeTrack && !playerOnDangerTrack;
 	}
 }
