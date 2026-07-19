@@ -39,28 +39,81 @@ public class PenguinCrushersOverlay extends Overlay
             return null;
         }
 
-        boolean safe = plugin.isSafeToCross();
-        boolean correct = plugin.isPlayerCrossingSafely();
+        CrossingStatus crossingStatus = plugin.getCurrentCrossingStatus();
 
-        String exitPlatformText = safe ? "Move now!" : "DON'T move!";
-        String startTileText = "Start here!";
+        String startTileText;
+        String exitPlatformText;
+        Color startTileTextColor;
+        Color exitPlatformTextColor;
 
-        Color startTileTextColor = config.startTileTextColor();
-        Color exitPlatformTextColor = safe ? config.endTileTextSafeColor() : config.endTileTextDangerColor();
-        Color crusherTileColor = safe ? config.crusherTilesSafeColor() : config.crusherTilesDangerColor();
-        Color exitPlatformTileColor = safe ? config.endTileSafeColor() : config.endTileDangerColor();
-        Color startTileColor = config.startTileColor();
-        Color dangerTileColor = safe ? config.dangerTilesSafeColor() : config.dangerTilesDangerColor();
-        Color safeTileColor = config.safeTilesColor();
+        Color crusherTileColor;
+        Color exitPlatformTileColor;
+        Color startTileColor;
+        Color dangerTileColor;
+        Color safeTileColor;
 
-        if (config.changeColorsOnCorrectCrossing() && correct)
+        switch (crossingStatus)
         {
-            exitPlatformText = "Correct!";
-            exitPlatformTextColor = config.endTileTextCorrectColor();
-            crusherTileColor = config.crusherTilesCorrectColor();
-            exitPlatformTileColor = config.endTileCorrectColor();
-            dangerTileColor = config.dangerTilesCorrectColor();
-            safeTileColor = config.safeTilesCorrectColor();
+            case UNSAFE_TO_CROSS:
+                startTileText = "Start here!";
+                exitPlatformText = "DON'T move!";
+                startTileTextColor = config.startTileTextColor();
+                exitPlatformTextColor = config.endTileTextDangerColor();
+
+                crusherTileColor = config.crusherTilesDangerColor();
+                exitPlatformTileColor = config.endTileDangerColor();
+                startTileColor = config.startTileColor();
+                dangerTileColor = config.dangerTilesDangerColor();
+                safeTileColor = config.safeTilesColor();
+                break;
+            case SAFE_TO_CROSS:
+                startTileText = "Start here!";
+                exitPlatformText = "Move now!";
+                startTileTextColor = config.startTileTextColor();
+                exitPlatformTextColor = config.endTileTextSafeColor();
+
+                crusherTileColor = config.crusherTilesSafeColor();
+                exitPlatformTileColor = config.endTileSafeColor();
+                startTileColor = config.startTileColor();
+                dangerTileColor = config.dangerTilesSafeColor();
+                safeTileColor = config.safeTilesColor();
+                break;
+            case CROSSING_SAFELY:
+                startTileText = "Start here!";
+                exitPlatformText = "Success!";
+                startTileTextColor = config.startTileTextColor();
+                exitPlatformTextColor = config.endTileTextCorrectColor();
+
+                crusherTileColor = config.crusherTilesCorrectColor();
+                exitPlatformTileColor = config.endTileCorrectColor();
+                startTileColor = config.startTileColor();
+                dangerTileColor = config.dangerTilesCorrectColor();
+                safeTileColor = config.safeTilesCorrectColor();
+                break;
+            case CROSSING_UNSAFELY:  // TODO separate configurable colors
+                startTileText = "Start here!";
+                exitPlatformText = "Wrong! Danger!";
+                startTileTextColor = config.startTileTextColor();
+                exitPlatformTextColor = config.endTileTextDangerColor();
+
+                crusherTileColor = config.crusherTilesDangerColor();
+                exitPlatformTileColor = config.endTileDangerColor();
+                startTileColor = config.startTileColor();
+                dangerTileColor = config.dangerTilesDangerColor();
+                safeTileColor = config.safeTilesColor();
+                break;
+            default:  // same as UNSAFE_TO_CROSS
+                startTileText = "Start here!";
+                exitPlatformText = "DON'T move!";
+                startTileTextColor = config.startTileTextColor();
+                exitPlatformTextColor = config.endTileTextDangerColor();
+
+                crusherTileColor = config.crusherTilesDangerColor();
+                exitPlatformTileColor = config.endTileDangerColor();
+                startTileColor = config.startTileColor();
+                dangerTileColor = config.dangerTilesDangerColor();
+                safeTileColor = config.safeTilesColor();
+                break;
         }
 
         startTileColor = ColorUtil.colorWithAlpha(startTileColor, startTileColor.getAlpha() / 4);

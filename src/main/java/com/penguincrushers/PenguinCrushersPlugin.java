@@ -130,6 +130,11 @@ public class PenguinCrushersPlugin extends Plugin
 	private boolean playerOnDangerTrack = false;
 	private boolean playerOnSafeTrack = false;
 
+	// maintain a single status variable for the overlay to use rather than have it call calculations directly
+	// this prevents colors changing to safe/danger for one frame before changing to correct/incorrect
+	@Getter
+	private CrossingStatus currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
+
 	private void clearData()
 	{
 		southSideCrushers.clear();
@@ -142,6 +147,7 @@ public class PenguinCrushersPlugin extends Plugin
 		lastPlayerDestination = null;
 		playerOnDangerTrack = false;
 		playerOnSafeTrack = false;
+		currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
 	}
 
 	@Inject
@@ -172,6 +178,7 @@ public class PenguinCrushersPlugin extends Plugin
 		lastPlayerDestination = null;
 		playerOnDangerTrack = false;
 		playerOnSafeTrack = false;
+		currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
 		log.debug("Penguin crushers started");
 	}
 
@@ -206,8 +213,12 @@ public class PenguinCrushersPlugin extends Plugin
 			lastPlayerLocation = null;
 			lastPlayerDestination = null;
 			playerOnSafeTrack = false;
+			currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
 			return;
 		}
+
+		// store this for later since updating lastPlayerLocation will make didPlayerJustMove() always false
+		boolean playerMovedThisTick = didPlayerJustMove();
 
 		if (!locationsRecentlyUpdated)
 		{
@@ -242,20 +253,41 @@ public class PenguinCrushersPlugin extends Plugin
 		}
 		else
 		{
+			WorldPoint location = client.getLocalPlayer().getWorldLocation();
 			LocalPoint localDestination = client.getLocalDestinationLocation();
-			if (localDestination == null)
+			if (localDestination == null)  // player is not queued to move
 			{
-				playerOnSafeTrack = didPlayerStartCrossingSafely();
+				// wait for one tick of no movement before recalculating when next to the exit to allow a tick to climb
+				if (!playerMovedThisTick || !location.equals(END_TILE_LOCATION.dx(-1)))
+				{
+					playerOnSafeTrack = didPlayerStartCrossingSafely();
+				}
 			}
-			else
+			else  // player is queued to move
 			{
+				// recalculate if destination tile changed
 				WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
-				WorldPoint location = client.getLocalPlayer().getWorldLocation();
 				if (destination.equals(location) || !destination.equals(lastPlayerDestination))
 				{
 					playerOnSafeTrack = didPlayerStartCrossingSafely();
 				}
 			}
+		}
+
+		// recalculate the current crossing status once per tick after the tick is processed
+		if (isPlayerCrossingSafely() && config.changeColorsOnCorrectCrossing())
+		{
+			// I don't love tying this to color config but in practice it is currently the only thing status affects
+			// maybe splitting enum into like CROSSING_SAFELY_SAFE can move this logic to the overlay where it belongs
+			currentCrossingStatus = CrossingStatus.CROSSING_SAFELY;
+		}
+		else if (isSafeToCross())
+		{
+			currentCrossingStatus = CrossingStatus.SAFE_TO_CROSS;
+		}
+		else
+		{
+			currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
 		}
 	}
 
@@ -318,17 +350,17 @@ public class PenguinCrushersPlugin extends Plugin
 		return false;
 	}
 
-	public boolean isSafeToCross()
+	private boolean isSafeToCross()
 	{
 		return locationsEverUpdated && !didCrushersJustMove();
 	}
 
-	public boolean didPlayerJustMove()
+	private boolean didPlayerJustMove()
 	{
 		return lastPlayerLocation != null && !lastPlayerLocation.equals(client.getLocalPlayer().getWorldLocation());
 	}
 
-	public boolean didPlayerStartCrossingSafely()
+	private boolean didPlayerStartCrossingSafely()
 	{
 		if (client.getLocalDestinationLocation() == null || client.getLocalPlayer() == null)
 		{
@@ -346,7 +378,7 @@ public class PenguinCrushersPlugin extends Plugin
 					|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross()));
 	}
 
-	public boolean isPlayerCrossingSafely()
+	private boolean isPlayerCrossingSafely()
 	{
 		return playerOnSafeTrack && !playerOnDangerTrack;
 	}
