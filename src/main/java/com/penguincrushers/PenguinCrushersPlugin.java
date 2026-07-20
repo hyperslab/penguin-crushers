@@ -65,14 +65,12 @@ public class PenguinCrushersPlugin extends Plugin
 		new WorldPoint(2630, 4054, 0)
 	);
 
-	// sound effect to play when the player starts crossing safely
+	// sound effects to play when the player starts crossing
+	private static final int UNSAFE_CROSSING_SOUND_EFFECT_ID = 203;  // teleblock impact
 	private static final int SAFE_CROSSING_SOUND_EFFECT_ID = 98;  // low alchemy
 
-	// wait one tick after movement to update the last crusher and player location values
-	private boolean locationsRecentlyUpdated = false;
-
 	// not safe to cross until we've seen the crushers move at least once
-	private boolean locationsEverUpdated = false;
+	private boolean haveCrushersEverMoved = false;
 
 	// crusher maps are <crusher, last position>
 	// in theory tracking the types of crushers separately lets us predict exact movement patterns...
@@ -141,8 +139,7 @@ public class PenguinCrushersPlugin extends Plugin
 		northWestCrushers.clear();
 		southCenterCrusher.clear();
 		northEastCrusher.clear();
-		locationsRecentlyUpdated = false;
-		locationsEverUpdated = false;
+		haveCrushersEverMoved = false;
 		lastPlayerLocation = null;
 		lastPlayerDestination = null;
 		playerOnDangerTrack = false;
@@ -172,8 +169,7 @@ public class PenguinCrushersPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
-		locationsRecentlyUpdated = false;
-		locationsEverUpdated = false;
+		haveCrushersEverMoved = false;
 		lastPlayerLocation = null;
 		lastPlayerDestination = null;
 		playerOnDangerTrack = false;
@@ -208,8 +204,7 @@ public class PenguinCrushersPlugin extends Plugin
 		// reset calculations if player is outside the crusher zone
 		if (!isInCrusherZone())
 		{
-			locationsRecentlyUpdated = false;
-			locationsEverUpdated = false;
+			haveCrushersEverMoved = false;
 			lastPlayerLocation = null;
 			lastPlayerDestination = null;
 			playerOnSafeTrack = false;
@@ -217,34 +212,50 @@ public class PenguinCrushersPlugin extends Plugin
 			return;
 		}
 
-		// store this for later since updating lastPlayerLocation will make didPlayerJustMove() always false
-		boolean playerMovedThisTick = didPlayerJustMove();
-
-		if (!locationsRecentlyUpdated)
+		// check for crusher movement
+		if (didCrushersJustMove())
 		{
-			for (NPC crusher : getCrushers().keySet())
-			{
-				updateCrusherLastLocation(crusher, crusher.getWorldLocation());
-			}
-			lastPlayerLocation = client.getLocalPlayer().getWorldLocation();
-			if (client.getLocalDestinationLocation() != null)
-			{
-				lastPlayerDestination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
-			}
-			locationsRecentlyUpdated = true;
+			haveCrushersEverMoved = true;
 		}
 
-		if (didCrushersJustMove())  // kind of jank to tie player location tracking to crushers but w/e it works
+		// calculate if player is currently moving dangerously (i.e. did not time movement correctly)
+		if (!playerOnDangerTrack)
 		{
-			locationsRecentlyUpdated = false;
-			locationsEverUpdated = true;
+			if (didPlayerStartCrossingDangerously())
+			{
+				playerOnDangerTrack = true;
+				if (config.playSoundOnIncorrectCrossing())
+				{
+					client.playSoundEffect(UNSAFE_CROSSING_SOUND_EFFECT_ID);
+				}
+			}
+		}
+		else
+		{
+			WorldPoint location = client.getLocalPlayer().getWorldLocation();
+			LocalPoint localDestination = client.getLocalDestinationLocation();
+			if (localDestination == null)  // player is not queued to move
+			{
+				playerOnDangerTrack = didPlayerStartCrossingDangerously();
+			}
+			else  // player is queued to move
+			{
+				// recalculate if destination tile changed
+				WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+				if (destination.equals(location) || !destination.equals(lastPlayerDestination))
+				{
+					playerOnDangerTrack = didPlayerStartCrossingDangerously();
+				}
+			}
 		}
 
+		// calculate if player is currently moving safely
 		if (!playerOnSafeTrack)
 		{
 			if (didPlayerStartCrossingSafely())
 			{
 				playerOnSafeTrack = true;
+				playerOnDangerTrack = false;  // becoming safe always overrides danger
 				if (config.playSoundOnCorrectCrossing())
 				{
 					client.playSoundEffect(SAFE_CROSSING_SOUND_EFFECT_ID);
@@ -258,7 +269,7 @@ public class PenguinCrushersPlugin extends Plugin
 			if (localDestination == null)  // player is not queued to move
 			{
 				// wait for one tick of no movement before recalculating when next to the exit to allow a tick to climb
-				if (!playerMovedThisTick || !location.equals(END_TILE_LOCATION.dx(-1)))
+				if (!didPlayerJustMove() || !location.equals(END_TILE_LOCATION.dx(-1)))
 				{
 					playerOnSafeTrack = didPlayerStartCrossingSafely();
 				}
@@ -274,11 +285,15 @@ public class PenguinCrushersPlugin extends Plugin
 			}
 		}
 
-		// recalculate the current crossing status once per tick after the tick is processed
-		if (isPlayerCrossingSafely() && config.changeColorsOnCorrectCrossing())
+		// re-set the current crossing status once per tick
+		// I don't love tying this to color config but in practice it is currently the only thing status affects
+		// maybe splitting enum into like CROSSING_SAFELY_SAFE can move this logic to the overlay where it belongs
+		if (playerOnDangerTrack && config.changeColorsOnIncorrectCrossing())
 		{
-			// I don't love tying this to color config but in practice it is currently the only thing status affects
-			// maybe splitting enum into like CROSSING_SAFELY_SAFE can move this logic to the overlay where it belongs
+			currentCrossingStatus = CrossingStatus.CROSSING_UNSAFELY;
+		}
+		else if (playerOnSafeTrack && config.changeColorsOnCorrectCrossing())
+		{
 			currentCrossingStatus = CrossingStatus.CROSSING_SAFELY;
 		}
 		else if (isSafeToCross())
@@ -288,6 +303,18 @@ public class PenguinCrushersPlugin extends Plugin
 		else
 		{
 			currentCrossingStatus = CrossingStatus.UNSAFE_TO_CROSS;
+		}
+
+		// update previous locations/destinations to those of the current tick
+		// must be last thing that happens in onGameTick, any new logic must come before this
+		for (NPC crusher : getCrushers().keySet())
+		{
+			updateCrusherLastLocation(crusher, crusher.getWorldLocation());
+		}
+		lastPlayerLocation = client.getLocalPlayer().getWorldLocation();
+		if (client.getLocalDestinationLocation() != null)
+		{
+			lastPlayerDestination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 		}
 	}
 
@@ -352,12 +379,38 @@ public class PenguinCrushersPlugin extends Plugin
 
 	private boolean isSafeToCross()
 	{
-		return locationsEverUpdated && !didCrushersJustMove();
+		return haveCrushersEverMoved && !didCrushersJustMove();
 	}
 
 	private boolean didPlayerJustMove()
 	{
 		return lastPlayerLocation != null && !lastPlayerLocation.equals(client.getLocalPlayer().getWorldLocation());
+	}
+
+	private boolean didPlayerStartCrossingDangerously()
+	{
+		if (client.getLocalPlayer() == null)
+		{
+			return false;
+		}
+
+		WorldPoint location = client.getLocalPlayer().getWorldLocation();
+
+		// if player isn't moving anymore, it counts as dangerous if they stopped on a danger tile
+		if (client.getLocalDestinationLocation() == null)
+		{
+			return didPlayerJustMove()
+					&& location.isInArea(CRUSHER_ZONE)
+					&& DANGER_TILE_LOCATIONS.contains(location);
+		}
+
+		WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+
+		return didPlayerJustMove()
+				&& location.isInArea(CRUSHER_ZONE)
+				&& (DANGER_TILE_LOCATIONS.contains(destination)
+					|| (DANGER_TILE_LOCATIONS.contains(location) && isSafeToCross())
+					|| (SAFE_TILE_LOCATIONS.contains(location) && !isSafeToCross()));
 	}
 
 	private boolean didPlayerStartCrossingSafely()
@@ -371,15 +424,9 @@ public class PenguinCrushersPlugin extends Plugin
 		WorldPoint location = client.getLocalPlayer().getWorldLocation();
 
 		return didPlayerJustMove()
-				&& !destination.equals(location)
-				&& destination.isInArea(CRUSHER_ZONE)
+				&& location.isInArea(CRUSHER_ZONE)
 				&& !DANGER_TILE_LOCATIONS.contains(destination)
 				&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
 					|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross()));
-	}
-
-	private boolean isPlayerCrossingSafely()
-	{
-		return playerOnSafeTrack && !playerOnDangerTrack;
 	}
 }

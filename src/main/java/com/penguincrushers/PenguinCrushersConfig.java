@@ -266,10 +266,87 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "safeTilesCorrectColor",
 			name = "Safe tiles correct color",
 			description = "Configures the color of the safe tile highlights when crossing correctly.",
-			position = 22
+			position = 23
 	)
 	default Color safeTilesCorrectColor()
 	{
 		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "playSoundOnIncorrectCrossing",
+			name = "Play sound on incorrect crossing",
+			description = "Play a sound effect when a mistimed crossing begins.",
+			position = 24
+	)
+	default boolean playSoundOnIncorrectCrossing()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "changeColorsOnIncorrectCrossing",
+			name = "Change colors on incorrect crossing",
+			description = "Change text and tile colors when a mistimed crossing begins.",
+			position = 25
+	)
+	default boolean changeColorsOnIncorrectCrossing()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "endTileTextIncorrectColor",
+			name = "End tile text incorrect color",
+			description = "Configures the color of the text above the end tile when crossing incorrectly.",
+			position = 26
+	)
+	default Color endTileTextIncorrectColor()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+			keyName = "crusherTilesIncorrectColor",
+			name = "Crusher tiles incorrect color",
+			description = "Configures the color of the crusher tile highlights when crossing incorrectly.",
+			position = 27
+	)
+	default Color crusherTilesIncorrectColor()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+			keyName = "endTileIncorrectColor",
+			name = "End tile incorrect color",
+			description = "Configures the color of the end tile highlight when crossing incorrectly.",
+			position = 28
+	)
+	default Color endTileIncorrectColor()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+			keyName = "dangerTilesIncorrectColor",
+			name = "Danger tiles incorrect color",
+			description = "Configures the color of the danger tile highlights when crossing incorrectly.",
+			position = 29
+	)
+	default Color dangerTilesIncorrectColor()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+			keyName = "safeTilesIncorrectColor",
+			name = "Safe tiles incorrect color",
+			description = "Configures the color of the safe tile highlights when crossing incorrectly.",
+			position = 30
+	)
+	default Color safeTilesIncorrectColor()
+	{
+		return Color.ORANGE;
 	}
 }

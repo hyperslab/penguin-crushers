@@ -90,17 +90,17 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesCorrectColor();
                 safeTileColor = config.safeTilesCorrectColor();
                 break;
-            case CROSSING_UNSAFELY:  // TODO separate configurable colors
+            case CROSSING_UNSAFELY:
                 startTileText = "Start here!";
                 exitPlatformText = "Wrong! Danger!";
                 startTileTextColor = config.startTileTextColor();
-                exitPlatformTextColor = config.endTileTextDangerColor();
+                exitPlatformTextColor = config.endTileTextIncorrectColor();
 
-                crusherTileColor = config.crusherTilesDangerColor();
-                exitPlatformTileColor = config.endTileDangerColor();
+                crusherTileColor = config.crusherTilesIncorrectColor();
+                exitPlatformTileColor = config.endTileIncorrectColor();
                 startTileColor = config.startTileColor();
-                dangerTileColor = config.dangerTilesDangerColor();
-                safeTileColor = config.safeTilesColor();
+                dangerTileColor = config.dangerTilesIncorrectColor();
+                safeTileColor = config.safeTilesIncorrectColor();
                 break;
             default:  // same as UNSAFE_TO_CROSS
                 startTileText = "Start here!";
