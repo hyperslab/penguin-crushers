@@ -402,10 +402,10 @@ public class PenguinCrushersPlugin extends Plugin
 
 		WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 
-		return didPlayerJustMove()
+		return DANGER_TILE_LOCATIONS.contains(destination)  // short circuit if destination is dangerous
+				|| didPlayerJustMove()
 				&& location.isInArea(CRUSHER_ZONE)
-				&& (DANGER_TILE_LOCATIONS.contains(destination)
-					|| (DANGER_TILE_LOCATIONS.contains(location) && isSafeToCross())
+				&& ((DANGER_TILE_LOCATIONS.contains(location) && isSafeToCross())
 					|| (SAFE_TILE_LOCATIONS.contains(location) && !isSafeToCross()));
 	}
 
@@ -419,10 +419,17 @@ public class PenguinCrushersPlugin extends Plugin
 		WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 		WorldPoint location = client.getLocalPlayer().getWorldLocation();
 
-		return didPlayerJustMove()
-				&& location.isInArea(CRUSHER_ZONE)
+		return location.isInArea(CRUSHER_ZONE)
 				&& !DANGER_TILE_LOCATIONS.contains(destination)
-				&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
-					|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross()));
+				&& ((didPlayerJustMove()  // player moving through the crushers with correct timing
+						&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
+							|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross())))
+					|| (!didPlayerJustMove()  // player blocked by a crusher, which will result in correct timing
+						&& !DANGER_TILE_LOCATIONS.contains(location))
+					|| (didPlayerJustMove()  // player moved onto safe territory (and is implicitly still moving)
+						&& !DANGER_TILE_LOCATIONS.contains(location)
+						&& !SAFE_TILE_LOCATIONS.contains(location)
+						&& (DANGER_TILE_LOCATIONS.contains(lastPlayerLocation)
+							|| SAFE_TILE_LOCATIONS.contains(lastPlayerLocation))));
 	}
 }
