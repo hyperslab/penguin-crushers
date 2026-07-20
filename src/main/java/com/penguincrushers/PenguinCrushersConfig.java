@@ -3,12 +3,27 @@ package com.penguincrushers;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 
 import java.awt.*;
 
 @ConfigGroup("penguincrushers")
 public interface PenguinCrushersConfig extends Config
 {
+	@ConfigSection(
+			name="Correct Crossing",
+			description = "Feedback when crossing correctly.",
+			position = 100
+	)
+	String correctCrossingSection = "correctCrossing";
+
+	@ConfigSection(
+			name="Incorrect Crossing",
+			description = "Feedback when crossing incorrectly.",
+			position = 101
+	)
+	String incorrectCrossingSection = "incorrectCrossing";
+
 	@ConfigItem(
 		keyName = "showText",
 		name = "Show text",
@@ -200,7 +215,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "playSoundOnCorrectCrossing",
 			name = "Play sound on correct crossing",
 			description = "Play a sound effect when a successful crossing begins.",
-			position = 17
+			position = 17,
+			section = correctCrossingSection
 	)
 	default boolean playSoundOnCorrectCrossing()
 	{
@@ -211,7 +227,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "correctCrossingSoundEffect",
 			name = "Correct crossing sound effect",
 			description = "The sound effect to play when a successful crossing begins.",
-			position = 18
+			position = 18,
+			section = correctCrossingSection
 	)
 	default CrossingSoundEffect correctCrossingSoundEffect()
 	{
@@ -222,7 +239,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "changeColorsOnCorrectCrossing",
 			name = "Change colors on correct crossing",
 			description = "Change text and tile colors when a successful crossing begins.",
-			position = 19
+			position = 19,
+			section = correctCrossingSection
 	)
 	default boolean changeColorsOnCorrectCrossing()
 	{
@@ -233,7 +251,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileTextCorrectColor",
 			name = "End tile text correct color",
 			description = "Configures the color of the text above the end tile when crossing correctly.",
-			position = 20
+			position = 20,
+			section = correctCrossingSection
 	)
 	default Color endTileTextCorrectColor()
 	{
@@ -244,7 +263,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "crusherTilesCorrectColor",
 			name = "Crusher tiles correct color",
 			description = "Configures the color of the crusher tile highlights when crossing correctly.",
-			position = 21
+			position = 21,
+			section = correctCrossingSection
 	)
 	default Color crusherTilesCorrectColor()
 	{
@@ -255,7 +275,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileCorrectColor",
 			name = "End tile correct color",
 			description = "Configures the color of the end tile highlight when crossing correctly.",
-			position = 22
+			position = 22,
+			section = correctCrossingSection
 	)
 	default Color endTileCorrectColor()
 	{
@@ -266,7 +287,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "dangerTilesCorrectColor",
 			name = "Danger tiles correct color",
 			description = "Configures the color of the danger tile highlights when crossing correctly.",
-			position = 23
+			position = 23,
+			section = correctCrossingSection
 	)
 	default Color dangerTilesCorrectColor()
 	{
@@ -277,7 +299,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "safeTilesCorrectColor",
 			name = "Safe tiles correct color",
 			description = "Configures the color of the safe tile highlights when crossing correctly.",
-			position = 24
+			position = 24,
+			section = correctCrossingSection
 	)
 	default Color safeTilesCorrectColor()
 	{
@@ -288,7 +311,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "playSoundOnIncorrectCrossing",
 			name = "Play sound on incorrect crossing",
 			description = "Play a sound effect when a mistimed crossing begins.",
-			position = 25
+			position = 25,
+			section = incorrectCrossingSection
 	)
 	default boolean playSoundOnIncorrectCrossing()
 	{
@@ -299,7 +323,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "incorrectCrossingSoundEffect",
 			name = "Incorrect crossing sound effect",
 			description = "The sound effect to play when a mistimed crossing begins.",
-			position = 26
+			position = 26,
+			section = incorrectCrossingSection
 	)
 	default CrossingSoundEffect incorrectCrossingSoundEffect()
 	{
@@ -310,7 +335,8 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "changeColorsOnIncorrectCrossing",
 			name = "Change colors on incorrect crossing",
 			description = "Change text and tile colors when a mistimed crossing begins.",
-			position = 27
+			position = 27,
+			section = incorrectCrossingSection
 	)
 	default boolean changeColorsOnIncorrectCrossing()
 	{
@@ -321,54 +347,59 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileTextIncorrectColor",
 			name = "End tile text incorrect color",
 			description = "Configures the color of the text above the end tile when crossing incorrectly.",
-			position = 28
+			position = 28,
+			section = incorrectCrossingSection
 	)
 	default Color endTileTextIncorrectColor()
 	{
-		return Color.ORANGE;
+		return Color.MAGENTA;
 	}
 
 	@ConfigItem(
 			keyName = "crusherTilesIncorrectColor",
 			name = "Crusher tiles incorrect color",
 			description = "Configures the color of the crusher tile highlights when crossing incorrectly.",
-			position = 29
+			position = 29,
+			section = incorrectCrossingSection
 	)
 	default Color crusherTilesIncorrectColor()
 	{
-		return Color.ORANGE;
+		return Color.MAGENTA;
 	}
 
 	@ConfigItem(
 			keyName = "endTileIncorrectColor",
 			name = "End tile incorrect color",
 			description = "Configures the color of the end tile highlight when crossing incorrectly.",
-			position = 30
+			position = 30,
+			section = incorrectCrossingSection
 	)
 	default Color endTileIncorrectColor()
 	{
-		return Color.ORANGE;
+		return Color.MAGENTA;
 	}
 
 	@ConfigItem(
 			keyName = "dangerTilesIncorrectColor",
 			name = "Danger tiles incorrect color",
 			description = "Configures the color of the danger tile highlights when crossing incorrectly.",
-			position = 31
+			position = 31,
+			section = incorrectCrossingSection
 	)
 	default Color dangerTilesIncorrectColor()
 	{
-		return Color.ORANGE;
+		return Color.MAGENTA;
 	}
 
 	@ConfigItem(
 			keyName = "safeTilesIncorrectColor",
 			name = "Safe tiles incorrect color",
 			description = "Configures the color of the safe tile highlights when crossing incorrectly.",
-			position = 32
+			position = 32,
+			section = incorrectCrossingSection
 	)
 	default Color safeTilesIncorrectColor()
 	{
-		return Color.ORANGE;
+		return Color.GREEN;
 	}
 }

@@ -80,7 +80,7 @@ public class PenguinCrushersOverlay extends Overlay
                 break;
             case CROSSING_SAFELY:
                 startTileText = "Start here!";
-                exitPlatformText = "Success!";
+                exitPlatformText = "Clear!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextCorrectColor();
 
@@ -92,7 +92,7 @@ public class PenguinCrushersOverlay extends Overlay
                 break;
             case CROSSING_UNSAFELY:
                 startTileText = "Start here!";
-                exitPlatformText = "Wrong! Danger!";
+                exitPlatformText = "Danger! Get to safety!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextIncorrectColor();
 
