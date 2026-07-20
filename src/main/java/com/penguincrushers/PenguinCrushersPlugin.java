@@ -65,10 +65,6 @@ public class PenguinCrushersPlugin extends Plugin
 		new WorldPoint(2630, 4054, 0)
 	);
 
-	// sound effects to play when the player starts crossing
-	private static final int UNSAFE_CROSSING_SOUND_EFFECT_ID = 203;  // teleblock impact
-	private static final int SAFE_CROSSING_SOUND_EFFECT_ID = 98;  // low alchemy
-
 	// not safe to cross until we've seen the crushers move at least once
 	private boolean haveCrushersEverMoved = false;
 
@@ -226,7 +222,7 @@ public class PenguinCrushersPlugin extends Plugin
 				playerOnDangerTrack = true;
 				if (config.playSoundOnIncorrectCrossing())
 				{
-					client.playSoundEffect(UNSAFE_CROSSING_SOUND_EFFECT_ID);
+					client.playSoundEffect(config.incorrectCrossingSoundEffect().getSoundEffectId());
 				}
 			}
 		}
@@ -258,7 +254,7 @@ public class PenguinCrushersPlugin extends Plugin
 				playerOnDangerTrack = false;  // becoming safe always overrides danger
 				if (config.playSoundOnCorrectCrossing())
 				{
-					client.playSoundEffect(SAFE_CROSSING_SOUND_EFFECT_ID);
+					client.playSoundEffect(config.correctCrossingSoundEffect().getSoundEffectId());
 				}
 			}
 		}

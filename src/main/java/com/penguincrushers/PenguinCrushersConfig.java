@@ -208,10 +208,21 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "correctCrossingSoundEffect",
+			name = "Correct crossing sound effect",
+			description = "The sound effect to play when a successful crossing begins.",
+			position = 18
+	)
+	default CrossingSoundEffect correctCrossingSoundEffect()
+	{
+		return CrossingSoundEffect.LOW_ALCHEMY;
+	}
+
+	@ConfigItem(
 			keyName = "changeColorsOnCorrectCrossing",
 			name = "Change colors on correct crossing",
 			description = "Change text and tile colors when a successful crossing begins.",
-			position = 18
+			position = 19
 	)
 	default boolean changeColorsOnCorrectCrossing()
 	{
@@ -222,7 +233,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileTextCorrectColor",
 			name = "End tile text correct color",
 			description = "Configures the color of the text above the end tile when crossing correctly.",
-			position = 19
+			position = 20
 	)
 	default Color endTileTextCorrectColor()
 	{
@@ -233,7 +244,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "crusherTilesCorrectColor",
 			name = "Crusher tiles correct color",
 			description = "Configures the color of the crusher tile highlights when crossing correctly.",
-			position = 20
+			position = 21
 	)
 	default Color crusherTilesCorrectColor()
 	{
@@ -244,7 +255,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileCorrectColor",
 			name = "End tile correct color",
 			description = "Configures the color of the end tile highlight when crossing correctly.",
-			position = 21
+			position = 22
 	)
 	default Color endTileCorrectColor()
 	{
@@ -255,7 +266,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "dangerTilesCorrectColor",
 			name = "Danger tiles correct color",
 			description = "Configures the color of the danger tile highlights when crossing correctly.",
-			position = 22
+			position = 23
 	)
 	default Color dangerTilesCorrectColor()
 	{
@@ -266,7 +277,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "safeTilesCorrectColor",
 			name = "Safe tiles correct color",
 			description = "Configures the color of the safe tile highlights when crossing correctly.",
-			position = 23
+			position = 24
 	)
 	default Color safeTilesCorrectColor()
 	{
@@ -277,7 +288,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "playSoundOnIncorrectCrossing",
 			name = "Play sound on incorrect crossing",
 			description = "Play a sound effect when a mistimed crossing begins.",
-			position = 24
+			position = 25
 	)
 	default boolean playSoundOnIncorrectCrossing()
 	{
@@ -285,10 +296,21 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "incorrectCrossingSoundEffect",
+			name = "Incorrect crossing sound effect",
+			description = "The sound effect to play when a mistimed crossing begins.",
+			position = 26
+	)
+	default CrossingSoundEffect incorrectCrossingSoundEffect()
+	{
+		return CrossingSoundEffect.TELEBLOCK_IMPACT;
+	}
+
+	@ConfigItem(
 			keyName = "changeColorsOnIncorrectCrossing",
 			name = "Change colors on incorrect crossing",
 			description = "Change text and tile colors when a mistimed crossing begins.",
-			position = 25
+			position = 27
 	)
 	default boolean changeColorsOnIncorrectCrossing()
 	{
@@ -299,7 +321,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileTextIncorrectColor",
 			name = "End tile text incorrect color",
 			description = "Configures the color of the text above the end tile when crossing incorrectly.",
-			position = 26
+			position = 28
 	)
 	default Color endTileTextIncorrectColor()
 	{
@@ -310,7 +332,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "crusherTilesIncorrectColor",
 			name = "Crusher tiles incorrect color",
 			description = "Configures the color of the crusher tile highlights when crossing incorrectly.",
-			position = 27
+			position = 29
 	)
 	default Color crusherTilesIncorrectColor()
 	{
@@ -321,7 +343,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "endTileIncorrectColor",
 			name = "End tile incorrect color",
 			description = "Configures the color of the end tile highlight when crossing incorrectly.",
-			position = 28
+			position = 30
 	)
 	default Color endTileIncorrectColor()
 	{
@@ -332,7 +354,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "dangerTilesIncorrectColor",
 			name = "Danger tiles incorrect color",
 			description = "Configures the color of the danger tile highlights when crossing incorrectly.",
-			position = 29
+			position = 31
 	)
 	default Color dangerTilesIncorrectColor()
 	{
@@ -343,7 +365,7 @@ public interface PenguinCrushersConfig extends Config
 			keyName = "safeTilesIncorrectColor",
 			name = "Safe tiles incorrect color",
 			description = "Configures the color of the safe tile highlights when crossing incorrectly.",
-			position = 30
+			position = 32
 	)
 	default Color safeTilesIncorrectColor()
 	{
