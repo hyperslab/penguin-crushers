@@ -425,6 +425,8 @@ public class PenguinCrushersPlugin extends Plugin
 						&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
 							|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross())))
 					|| (!didPlayerJustMove()  // player blocked by a crusher, which will result in correct timing
+						&& destination.getX() < START_TILE_LOCATION.getX()  // don't trigger when you first come down
+						&& lastPlayerLocation != null  // or enter from the north if you're messing around
 						&& !DANGER_TILE_LOCATIONS.contains(location))
 					|| (didPlayerJustMove()  // player moved onto safe territory (and is implicitly still moving)
 						&& !DANGER_TILE_LOCATIONS.contains(location)
