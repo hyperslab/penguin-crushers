@@ -40,79 +40,98 @@ public class PenguinCrushersOverlay extends Overlay
         }
 
         CrossingStatus crossingStatus = plugin.getCurrentCrossingStatus();
+        WorldPoint escapeTile = plugin.getSouthRowEscapeTile();  // will return null if configured off (or not needed)
 
         String startTileText;
         String exitPlatformText;
+        String escapeTileText;
         Color startTileTextColor;
         Color exitPlatformTextColor;
+        Color escapeTileTextColor;
 
         Color crusherTileColor;
         Color exitPlatformTileColor;
         Color startTileColor;
         Color dangerTileColor;
         Color safeTileColor;
+        Color escapeTileColor;
 
         switch (crossingStatus)
         {
             case UNSAFE_TO_CROSS:
                 startTileText = "Start here!";
                 exitPlatformText = "DON'T move!";
+                escapeTileText = "DON'T move!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextDangerColor();
+                escapeTileTextColor = config.southRowEscapeTileTextDangerColor();
 
                 crusherTileColor = config.crusherTilesDangerColor();
                 exitPlatformTileColor = config.endTileDangerColor();
                 startTileColor = config.startTileColor();
                 dangerTileColor = config.dangerTilesDangerColor();
                 safeTileColor = config.safeTilesColor();
+                escapeTileColor = config.southRowEscapeTileDangerColor();
                 break;
             case SAFE_TO_CROSS:
                 startTileText = "Start here!";
                 exitPlatformText = "Move now!";
+                escapeTileText = "Move here!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextSafeColor();
+                escapeTileTextColor = config.southRowEscapeTileTextSafeColor();
 
                 crusherTileColor = config.crusherTilesSafeColor();
                 exitPlatformTileColor = config.endTileSafeColor();
                 startTileColor = config.startTileColor();
                 dangerTileColor = config.dangerTilesSafeColor();
                 safeTileColor = config.safeTilesColor();
+                escapeTileColor = config.southRowEscapeTileSafeColor();
                 break;
             case CROSSING_SAFELY:
                 startTileText = "Start here!";
                 exitPlatformText = "Clear!";
+                escapeTileText = "Escape clear!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextCorrectColor();
+                escapeTileTextColor = config.southRowEscapeTileTextSafeColor();
 
                 crusherTileColor = config.crusherTilesCorrectColor();
                 exitPlatformTileColor = config.endTileCorrectColor();
                 startTileColor = config.startTileColor();
                 dangerTileColor = config.dangerTilesCorrectColor();
                 safeTileColor = config.safeTilesCorrectColor();
+                escapeTileColor = config.southRowEscapeTileSafeColor();
                 break;
             case CROSSING_UNSAFELY:
                 startTileText = "Start here!";
                 exitPlatformText = "Danger! Get to safety!";
+                escapeTileText = "Move here, quick!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextIncorrectColor();
+                escapeTileTextColor = config.southRowEscapeTileTextSafeColor();
 
                 crusherTileColor = config.crusherTilesIncorrectColor();
                 exitPlatformTileColor = config.endTileIncorrectColor();
                 startTileColor = config.startTileColor();
                 dangerTileColor = config.dangerTilesIncorrectColor();
                 safeTileColor = config.safeTilesIncorrectColor();
+                escapeTileColor = config.southRowEscapeTileSafeColor();
                 break;
-            default:  // same as UNSAFE_TO_CROSS
+            default:  // same as UNSAFE_TO_CROSS (but should never be hit)
                 startTileText = "Start here!";
                 exitPlatformText = "DON'T move!";
+                escapeTileText = "DON'T move!";
                 startTileTextColor = config.startTileTextColor();
                 exitPlatformTextColor = config.endTileTextDangerColor();
+                escapeTileTextColor = config.southRowEscapeTileTextDangerColor();
 
                 crusherTileColor = config.crusherTilesDangerColor();
                 exitPlatformTileColor = config.endTileDangerColor();
                 startTileColor = config.startTileColor();
                 dangerTileColor = config.dangerTilesDangerColor();
                 safeTileColor = config.safeTilesColor();
+                escapeTileColor = config.southRowEscapeTileDangerColor();
                 break;
         }
 
@@ -135,7 +154,7 @@ public class PenguinCrushersOverlay extends Overlay
             }
         }
 
-        if (config.highlightEndTile())
+        if (config.highlightEndTile() && escapeTile == null)
         {
             LocalPoint endTileLocal = LocalPoint.fromWorld(client, PenguinCrushersPlugin.END_TILE_LOCATION);
             if (endTileLocal != null)
@@ -206,6 +225,28 @@ public class PenguinCrushersOverlay extends Overlay
                     if (tilePoly != null)
                     {
                         OverlayUtil.renderPolygon(graphics, tilePoly, safeTileColor, safeTileColor, smallBorder);
+                    }
+                }
+            }
+        }
+
+        if (escapeTile != null)
+        {
+            LocalPoint escapeTileLocal = LocalPoint.fromWorld(client, escapeTile);
+            if (escapeTileLocal != null)
+            {
+                Polygon tilePoly = Perspective.getCanvasTilePoly(client, escapeTileLocal);
+                if (tilePoly != null)
+                {
+                    OverlayUtil.renderPolygon(graphics, tilePoly, escapeTileColor);
+                }
+
+                if (config.showText())
+                {
+                    Point textLocation = Perspective.getCanvasTextLocation(client, graphics, escapeTileLocal, escapeTileText, 160);
+                    if (textLocation != null)
+                    {
+                        OverlayUtil.renderTextLocation(graphics, textLocation, escapeTileText, escapeTileTextColor);
                     }
                 }
             }

@@ -24,6 +24,13 @@ public interface PenguinCrushersConfig extends Config
 	)
 	String incorrectCrossingSection = "incorrectCrossing";
 
+	@ConfigSection(
+			name="South Row Escape",
+			description = "Assistance getting out of the south row.",
+			position = 102
+	)
+	String southRowEscapeSection = "southRowEscape";
+
 	@ConfigItem(
 		keyName = "showText",
 		name = "Show text",
@@ -401,5 +408,67 @@ public interface PenguinCrushersConfig extends Config
 	default Color safeTilesIncorrectColor()
 	{
 		return Color.GREEN;
+	}
+
+	@ConfigItem(
+			keyName = "southRowEscapeAssist",
+			name = "South row escape assist",
+			description = "Highlight the tile you should move to when caught between the south row of crushers." +
+					"<br/>Note directions from the south row may be unreliable if this is switched off." +
+					"<br/>(This doesn't matter if you always manage to cross normally.)",
+			position = 33,
+			section = southRowEscapeSection
+	)
+	default boolean southRowEscapeAssist()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "southRowEscapeTileTextSafeColor",
+			name = "South row escape tile text safe color",
+			description = "Configures the color of the text above the south row escape tile when the crushers are not moving.",
+			position = 34,
+			section = southRowEscapeSection
+	)
+	default Color southRowEscapeTileTextSafeColor()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+			keyName = "southRowEscapeRowEscapeTileTextDangerColor",
+			name = "South row escape tile text danger color",
+			description = "Configures the color of the text above the south row escape tile when the crushers are moving.",
+			position = 35,
+			section = southRowEscapeSection
+	)
+	default Color southRowEscapeTileTextDangerColor()
+	{
+		return Color.RED;
+	}
+
+	@ConfigItem(
+			keyName = "southRowEscapeTileSafeColor",
+			name = "South row escape tile safe color",
+			description = "Configures the color of the south row escape tile highlight when the crushers are not moving.",
+			position = 36,
+			section = southRowEscapeSection
+	)
+	default Color southRowEscapeTileSafeColor()
+	{
+		return Color.BLUE;
+	}
+
+	@ConfigItem(
+			keyName = "southRowEscapeTileDangerColor",
+			name = "South row escape tile danger color",
+			description = "Configures the color of the south row escape tile highlight when the crushers are moving.",
+			position = 37,
+			section = southRowEscapeSection
+	)
+	default Color southRowEscapeTileDangerColor()
+	{
+		return Color.RED;
 	}
 }

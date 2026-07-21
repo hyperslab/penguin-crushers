@@ -208,6 +208,11 @@ public class PenguinCrushersPlugin extends Plugin
 			return;
 		}
 
+		// set up local variables
+		WorldPoint location = client.getLocalPlayer().getWorldLocation();
+		LocalPoint localDestination = client.getLocalDestinationLocation();
+		WorldPoint destination = localDestination != null ? WorldPoint.fromLocal(client, localDestination) : null;
+
 		// check for crusher movement
 		if (didCrushersJustMove())
 		{
@@ -228,16 +233,13 @@ public class PenguinCrushersPlugin extends Plugin
 		}
 		else
 		{
-			WorldPoint location = client.getLocalPlayer().getWorldLocation();
-			LocalPoint localDestination = client.getLocalDestinationLocation();
-			if (localDestination == null)  // player is not queued to move
+			if (destination == null)  // player is not queued to move
 			{
 				playerOnDangerTrack = didPlayerStartCrossingDangerously();
 			}
 			else  // player is queued to move
 			{
 				// recalculate if destination tile changed
-				WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 				if (destination.equals(location) || !destination.equals(lastPlayerDestination))
 				{
 					playerOnDangerTrack = didPlayerStartCrossingDangerously();
@@ -260,9 +262,7 @@ public class PenguinCrushersPlugin extends Plugin
 		}
 		else
 		{
-			WorldPoint location = client.getLocalPlayer().getWorldLocation();
-			LocalPoint localDestination = client.getLocalDestinationLocation();
-			if (localDestination == null)  // player is not queued to move
+			if (destination == null)  // player is not queued to move
 			{
 				// wait for one tick of no movement before recalculating when next to the exit to allow a tick to climb
 				if (!didPlayerJustMove() || !location.equals(END_TILE_LOCATION.dx(-1)))
@@ -273,7 +273,6 @@ public class PenguinCrushersPlugin extends Plugin
 			else  // player is queued to move
 			{
 				// recalculate if destination tile changed
-				WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 				if (destination.equals(location) || !destination.equals(lastPlayerDestination))
 				{
 					playerOnSafeTrack = didPlayerStartCrossingSafely();
@@ -419,6 +418,13 @@ public class PenguinCrushersPlugin extends Plugin
 		WorldPoint destination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
 		WorldPoint location = client.getLocalPlayer().getWorldLocation();
 
+		// special case: south row escape in progress
+		WorldPoint escapeTile = getSouthRowEscapeTile();
+		if (escapeTile != null)
+		{
+			return destination.equals(escapeTile);  // this will only ever be true if blocked by crushers but that's ok
+		}
+
 		return location.isInArea(CRUSHER_ZONE)
 				&& !DANGER_TILE_LOCATIONS.contains(destination)
 				&& ((didPlayerJustMove()  // player moving through the crushers with correct timing
@@ -433,5 +439,36 @@ public class PenguinCrushersPlugin extends Plugin
 						&& !SAFE_TILE_LOCATIONS.contains(location)
 						&& (DANGER_TILE_LOCATIONS.contains(lastPlayerLocation)
 							|| SAFE_TILE_LOCATIONS.contains(lastPlayerLocation))));
+	}
+
+	public WorldPoint getSouthRowEscapeTile()
+	{
+		if (!config.southRowEscapeAssist() || client.getLocalPlayer() == null)
+		{
+			return null;  // null return = no need to escape
+		}
+
+		WorldPoint location = client.getLocalPlayer().getWorldLocation();
+
+		if (!location.isInArea(CRUSHER_ZONE) || location.getY() != CRUSHER_ZONE.getY())
+		{
+			return null;  // null return = no need to escape
+		}
+
+		// prefer northwest, straight north if on a danger tile, northeast if at the edge
+		WorldPoint escapeTile = location.dy(1).dx(-1);
+		if (DANGER_TILE_LOCATIONS.contains(location))
+		{
+			escapeTile = location.dy(1);
+		}
+		else if (!escapeTile.isInArea(CRUSHER_ZONE))
+		{
+			escapeTile = location.dy(1).dx(1);
+		}
+		if (!escapeTile.isInArea(CRUSHER_ZONE) || DANGER_TILE_LOCATIONS.contains(escapeTile))
+		{
+			escapeTile = null;  // shouldn't ever get here
+		}
+		return escapeTile;
 	}
 }
