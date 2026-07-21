@@ -56,6 +56,10 @@ public class PenguinCrushersOverlay extends Overlay
         Color safeTileColor;
         Color escapeTileColor;
 
+        Color timerLeftColor;
+        Color timerRightColor;
+        Color timerBorderColor;
+
         switch (crossingStatus)
         {
             case UNSAFE_TO_CROSS:
@@ -72,6 +76,10 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesDangerColor();
                 safeTileColor = config.safeTilesColor();
                 escapeTileColor = config.southRowEscapeTileDangerColor();
+
+                timerLeftColor = config.timerFullColor();
+                timerRightColor = config.timerFullColor();
+                timerBorderColor = config.timerBorderColor();
                 break;
             case SAFE_TO_CROSS:
                 startTileText = "Start here!";
@@ -87,6 +95,10 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesSafeColor();
                 safeTileColor = config.safeTilesColor();
                 escapeTileColor = config.southRowEscapeTileSafeColor();
+
+                timerLeftColor = config.timerLeftColor();
+                timerRightColor = config.timerRightColor();
+                timerBorderColor = config.timerBorderColor();
                 break;
             case CROSSING_SAFELY:
                 startTileText = "Start here!";
@@ -102,6 +114,10 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesCorrectColor();
                 safeTileColor = config.safeTilesCorrectColor();
                 escapeTileColor = config.southRowEscapeTileSafeColor();
+
+                timerLeftColor = config.timerLeftColor();
+                timerRightColor = config.timerRightColor();
+                timerBorderColor = config.timerBorderColor();
                 break;
             case CROSSING_UNSAFELY:
                 startTileText = "Start here!";
@@ -117,6 +133,10 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesIncorrectColor();
                 safeTileColor = config.safeTilesIncorrectColor();
                 escapeTileColor = config.southRowEscapeTileSafeColor();
+
+                timerLeftColor = config.timerFullColor();
+                timerRightColor = config.timerFullColor();
+                timerBorderColor = config.timerBorderColor();
                 break;
             default:  // same as UNSAFE_TO_CROSS (but should never be hit)
                 startTileText = "Start here!";
@@ -132,6 +152,10 @@ public class PenguinCrushersOverlay extends Overlay
                 dangerTileColor = config.dangerTilesDangerColor();
                 safeTileColor = config.safeTilesColor();
                 escapeTileColor = config.southRowEscapeTileDangerColor();
+
+                timerLeftColor = config.timerFullColor();
+                timerRightColor = config.timerFullColor();
+                timerBorderColor = config.timerBorderColor();
                 break;
         }
 
@@ -140,6 +164,7 @@ public class PenguinCrushersOverlay extends Overlay
         safeTileColor = ColorUtil.colorWithAlpha(safeTileColor, safeTileColor.getAlpha() / 5);
 
         Stroke smallBorder = new BasicStroke(0.5f);
+        Stroke normalBorder = new BasicStroke(1.2f);
 
         if (config.highlightCrusherTiles())
         {
@@ -172,6 +197,29 @@ public class PenguinCrushersOverlay extends Overlay
                     {
                         OverlayUtil.renderTextLocation(graphics, textLocation, exitPlatformText, exitPlatformTextColor);
                     }
+                }
+            }
+        }
+
+        if (config.showTimer() && (crossingStatus == CrossingStatus.SAFE_TO_CROSS || crossingStatus == CrossingStatus.UNSAFE_TO_CROSS))
+        {
+            LocalPoint endTileLocal = LocalPoint.fromWorld(client, PenguinCrushersPlugin.END_TILE_LOCATION);
+            if (endTileLocal != null)
+            {
+                Point timerLocation = Perspective.getCanvasTextLocation(client, graphics, endTileLocal, "", 160);
+
+                // assume a tick is always 600ms (in reality it varies a little but not really a way to anticipate it)
+                double percentFull = Math.min(System.currentTimeMillis() - plugin.getLastSafeTimeStart(), 600) / 600f;
+
+                if (timerLocation != null)
+                {
+                    timerLocation = new Point(timerLocation.getX() - 40, timerLocation.getY() + 8);
+
+                    Shape timerBounds = new Rectangle(timerLocation.getX(), timerLocation.getY(), 80, 8);
+                    Shape timerBar = new Rectangle(timerLocation.getX(), timerLocation.getY(), (int) Math.round(80f * percentFull), 8);
+
+                    OverlayUtil.renderPolygon(graphics, timerBounds, timerBorderColor, timerRightColor, normalBorder);
+                    OverlayUtil.renderPolygon(graphics, timerBar, timerBorderColor, timerLeftColor, smallBorder);
                 }
             }
         }

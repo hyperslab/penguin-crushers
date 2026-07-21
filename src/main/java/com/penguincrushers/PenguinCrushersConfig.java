@@ -31,6 +31,13 @@ public interface PenguinCrushersConfig extends Config
 	)
 	String southRowEscapeSection = "southRowEscape";
 
+	@ConfigSection(
+			name="Graphical Timer",
+			description = "Graphical tick timer drawn over the end tile.",
+			position = 103
+	)
+	String graphicalTimer = "graphicalTimer";
+
 	@ConfigItem(
 		keyName = "showText",
 		name = "Show text",
@@ -470,5 +477,66 @@ public interface PenguinCrushersConfig extends Config
 	default Color southRowEscapeTileDangerColor()
 	{
 		return Color.RED;
+	}
+
+	@ConfigItem(
+			keyName = "showTimer",
+			name = "Show timer",
+			description = "Show a graphical timer indicating when the safe-to-click period will end.",
+			position = 38,
+			section = graphicalTimer
+	)
+	default boolean showTimer()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+			keyName = "timerLeftColor",
+			name = "Timer left color",
+			description = "Configures the color of the left side of the graphical timer that gradually fills.",
+			position = 39,
+			section = graphicalTimer
+	)
+	default Color timerLeftColor()
+	{
+		return Color.YELLOW;
+	}
+
+	@ConfigItem(
+			keyName = "timerRightColor",
+			name = "Timer right color",
+			description = "Configures the color of the right side of the graphical timer that gradually shrinks.",
+			position = 40,
+			section = graphicalTimer
+	)
+	default Color timerRightColor()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+			keyName = "timerFullColor",
+			name = "Timer full color",
+			description = "Configures the color of the graphical timer when it is not safe to cross.",
+			position = 41,
+			section = graphicalTimer
+	)
+	default Color timerFullColor()
+	{
+		return Color.RED;
+	}
+
+	@ConfigItem(
+			keyName = "timerBorderColor",
+			name = "Timer border color",
+			description = "Configures the color of the graphical timer's outline." +
+					"<br/>Also controls the color of where the left and right colors meet.",
+			position = 42,
+			section = graphicalTimer
+	)
+	default Color timerBorderColor()
+	{
+		return Color.BLACK;
 	}
 }

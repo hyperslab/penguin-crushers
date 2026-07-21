@@ -124,6 +124,10 @@ public class PenguinCrushersPlugin extends Plugin
 	private boolean playerOnDangerTrack = false;
 	private boolean playerOnSafeTrack = false;
 
+	// update timestamp in ms whenever it becomes safe to cross
+	@Getter
+	private long lastSafeTimeStart;
+
 	// maintain a single status variable for the overlay to use rather than have it call calculations directly
 	// this prevents colors changing to safe/danger for one frame before changing to correct/incorrect
 	@Getter
@@ -294,6 +298,7 @@ public class PenguinCrushersPlugin extends Plugin
 		else if (isSafeToCross())
 		{
 			currentCrossingStatus = CrossingStatus.SAFE_TO_CROSS;
+			lastSafeTimeStart = System.currentTimeMillis();
 		}
 		else
 		{
