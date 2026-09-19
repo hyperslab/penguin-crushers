@@ -121,6 +121,13 @@ public class PenguinCrushersPlugin extends Plugin
 	private WorldPoint lastPlayerLocation;
 	private WorldPoint lastPlayerDestination;
 
+	// track when destination changes locally to provide time buffer when determining if player was "supposed" to move
+	// if player clicks to move at the end of a game tick it won't reach the server until the tick after
+	// but the client doesn't know that, and we can't read destination from the server, so use time buffer as Band-Aid
+	// separate concept from lastPlayerDestination which is the destination on the previous game tick
+	private WorldPoint lastClientTickDestination;
+	private long lastDestinationChangeTime;
+
 	private boolean playerOnDangerTrack = false;
 	private boolean playerOnSafeTrack = false;
 
@@ -319,6 +326,24 @@ public class PenguinCrushersPlugin extends Plugin
 	}
 
 	@Subscribe
+	public void onClientTick(ClientTick clientTick)
+	{
+		WorldPoint currentDestination = null;
+		if (client.getLocalDestinationLocation() != null)
+		{
+			currentDestination = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+		}
+
+		if ((lastClientTickDestination == null && currentDestination != null)
+			|| (lastClientTickDestination != null && currentDestination == null)
+			|| (lastClientTickDestination != null && !lastClientTickDestination.equals(currentDestination)))
+		{
+			lastClientTickDestination = currentDestination;
+			lastDestinationChangeTime = System.currentTimeMillis();
+		}
+	}
+
+	@Subscribe
 	public void onNpcSpawned(NpcSpawned npcSpawned)
 	{
 		NPC npc = npcSpawned.getNpc();
@@ -436,6 +461,8 @@ public class PenguinCrushersPlugin extends Plugin
 						&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
 							|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross())))
 					|| (!didPlayerJustMove()  // player blocked by a crusher, which will result in correct timing
+						&& System.currentTimeMillis() - lastDestinationChangeTime >= 100  // let click reach server
+						&& System.currentTimeMillis() - lastDestinationChangeTime < 1000  // check client tick ran first
 						&& destination.getX() <= START_TILE_LOCATION.getX()  // don't trigger when you first come down
 						&& lastPlayerLocation != null  // or enter from the north if you're messing around
 						&& !DANGER_TILE_LOCATIONS.contains(location))
