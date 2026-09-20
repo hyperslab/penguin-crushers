@@ -59,6 +59,7 @@ public class PenguinCrushersOverlay extends Overlay
         Color timerLeftColor;
         Color timerRightColor;
         Color timerBorderColor;
+        Color timerBufferColor;
 
         switch (crossingStatus)
         {
@@ -80,6 +81,7 @@ public class PenguinCrushersOverlay extends Overlay
                 timerLeftColor = config.timerFullColor();
                 timerRightColor = config.timerFullColor();
                 timerBorderColor = config.timerBorderColor();
+                timerBufferColor = config.timerFullColor();
                 break;
             case SAFE_TO_CROSS:
                 startTileText = "Start here!";
@@ -99,6 +101,7 @@ public class PenguinCrushersOverlay extends Overlay
                 timerLeftColor = config.timerLeftColor();
                 timerRightColor = config.timerRightColor();
                 timerBorderColor = config.timerBorderColor();
+                timerBufferColor = config.timerBufferColor();
                 break;
             case CROSSING_SAFELY:
                 startTileText = "Start here!";
@@ -118,6 +121,7 @@ public class PenguinCrushersOverlay extends Overlay
                 timerLeftColor = config.timerLeftColor();
                 timerRightColor = config.timerRightColor();
                 timerBorderColor = config.timerBorderColor();
+                timerBufferColor = config.timerBufferColor();
                 break;
             case CROSSING_UNSAFELY:
                 startTileText = "Start here!";
@@ -137,6 +141,7 @@ public class PenguinCrushersOverlay extends Overlay
                 timerLeftColor = config.timerFullColor();
                 timerRightColor = config.timerFullColor();
                 timerBorderColor = config.timerBorderColor();
+                timerBufferColor = config.timerFullColor();
                 break;
             default:  // same as UNSAFE_TO_CROSS (but should never be hit)
                 startTileText = "Start here!";
@@ -156,6 +161,7 @@ public class PenguinCrushersOverlay extends Overlay
                 timerLeftColor = config.timerFullColor();
                 timerRightColor = config.timerFullColor();
                 timerBorderColor = config.timerBorderColor();
+                timerBufferColor = config.timerFullColor();
                 break;
         }
 
@@ -208,17 +214,25 @@ public class PenguinCrushersOverlay extends Overlay
             {
                 Point timerLocation = Perspective.getCanvasTextLocation(client, graphics, endTileLocal, "", 160);
 
-                // assume a tick is always 600ms (in reality it varies a little but not really a way to anticipate it)
-                double percentFull = Math.min(System.currentTimeMillis() - plugin.getLastSafeTimeStart(), 600) / 600f;
-
                 if (timerLocation != null)
                 {
                     timerLocation = new Point(timerLocation.getX() - 40, timerLocation.getY() + 8);
 
-                    Shape timerBounds = new Rectangle(timerLocation.getX(), timerLocation.getY(), 80, 8);
-                    Shape timerBar = new Rectangle(timerLocation.getX(), timerLocation.getY(), (int) Math.round(80f * percentFull), 8);
+                    // assume a game tick is always 600ms (in reality it varies a little but not really a way to anticipate it)
+                    int tickLength = 600;
 
+                    Shape timerBounds = new Rectangle(timerLocation.getX(), timerLocation.getY(), 80, 8);
                     OverlayUtil.renderPolygon(graphics, timerBounds, timerBorderColor, timerRightColor, normalBorder);
+
+                    if (config.showBuffer() && crossingStatus == CrossingStatus.SAFE_TO_CROSS)
+                    {
+                        double percentBuffer = Math.min(Math.max(config.movementBufferMs(), 0), tickLength) / (double) tickLength;
+                        Shape timerBuffer = new Rectangle(timerLocation.getX() + 80 - (int) Math.round(80f * percentBuffer), timerLocation.getY(), (int) Math.round(80f * percentBuffer), 8);
+                        OverlayUtil.renderPolygon(graphics, timerBuffer, timerBorderColor, timerBufferColor, smallBorder);
+                    }
+
+                    double percentFull = Math.min(System.currentTimeMillis() - plugin.getLastSafeTimeStart(), tickLength) / (double) tickLength;
+                    Shape timerBar = new Rectangle(timerLocation.getX(), timerLocation.getY(), (int) Math.round(80f * percentFull), 8);
                     OverlayUtil.renderPolygon(graphics, timerBar, timerBorderColor, timerLeftColor, smallBorder);
                 }
             }

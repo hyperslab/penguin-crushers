@@ -11,32 +11,39 @@ import java.awt.*;
 public interface PenguinCrushersConfig extends Config
 {
 	@ConfigSection(
-			name="Correct Crossing",
-			description = "Feedback when crossing correctly.",
-			position = 100
+		name="Correct Crossing",
+		description = "Feedback when crossing correctly.",
+		position = 100
 	)
 	String correctCrossingSection = "correctCrossing";
 
 	@ConfigSection(
-			name="Incorrect Crossing",
-			description = "Feedback when crossing incorrectly.",
-			position = 101
+		name="Incorrect Crossing",
+		description = "Feedback when crossing incorrectly.",
+		position = 101
 	)
 	String incorrectCrossingSection = "incorrectCrossing";
 
 	@ConfigSection(
-			name="South Row Escape",
-			description = "Assistance getting out of the south row.",
-			position = 102
+		name="South Row Escape",
+		description = "Assistance getting out of the south row.",
+		position = 102
 	)
 	String southRowEscapeSection = "southRowEscape";
 
 	@ConfigSection(
-			name="Graphical Timer",
-			description = "Graphical tick timer drawn over the end tile.",
-			position = 103
+		name="Graphical Timer",
+		description = "Graphical tick timer drawn over the end tile.",
+		position = 103
 	)
-	String graphicalTimer = "graphicalTimer";
+	String graphicalTimerSection = "graphicalTimer";
+
+	@ConfigSection(
+		name="Advanced",
+		description = "Advanced options.",
+		position = 104
+	)
+	String advancedSection = "advanced";
 
 	@ConfigItem(
 		keyName = "showText",
@@ -226,11 +233,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "playSoundOnCorrectCrossing",
-			name = "Play sound on correct crossing",
-			description = "Play a sound effect when a successful crossing begins.",
-			position = 17,
-			section = correctCrossingSection
+		keyName = "playSoundOnCorrectCrossing",
+		name = "Play sound on correct crossing",
+		description = "Play a sound effect when a successful crossing begins.",
+		position = 17,
+		section = correctCrossingSection
 	)
 	default boolean playSoundOnCorrectCrossing()
 	{
@@ -238,11 +245,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "correctCrossingSoundEffect",
-			name = "Correct crossing sound effect",
-			description = "The sound effect to play when a successful crossing begins.",
-			position = 18,
-			section = correctCrossingSection
+		keyName = "correctCrossingSoundEffect",
+		name = "Correct crossing sound effect",
+		description = "The sound effect to play when a successful crossing begins.",
+		position = 18,
+		section = correctCrossingSection
 	)
 	default CrossingSoundEffect correctCrossingSoundEffect()
 	{
@@ -250,11 +257,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "changeColorsOnCorrectCrossing",
-			name = "Change colors on correct crossing",
-			description = "Change text and tile colors when a successful crossing begins.",
-			position = 19,
-			section = correctCrossingSection
+		keyName = "changeColorsOnCorrectCrossing",
+		name = "Change colors on correct crossing",
+		description = "Change text and tile colors when a successful crossing begins.",
+		position = 19,
+		section = correctCrossingSection
 	)
 	default boolean changeColorsOnCorrectCrossing()
 	{
@@ -262,11 +269,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "endTileTextCorrectColor",
-			name = "End tile text correct color",
-			description = "Configures the color of the text above the end tile when crossing correctly.",
-			position = 20,
-			section = correctCrossingSection
+		keyName = "endTileTextCorrectColor",
+		name = "End tile text correct color",
+		description = "Configures the color of the text above the end tile when crossing correctly.",
+		position = 20,
+		section = correctCrossingSection
 	)
 	default Color endTileTextCorrectColor()
 	{
@@ -274,11 +281,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "crusherTilesCorrectColor",
-			name = "Crusher tiles correct color",
-			description = "Configures the color of the crusher tile highlights when crossing correctly.",
-			position = 21,
-			section = correctCrossingSection
+		keyName = "crusherTilesCorrectColor",
+		name = "Crusher tiles correct color",
+		description = "Configures the color of the crusher tile highlights when crossing correctly.",
+		position = 21,
+		section = correctCrossingSection
 	)
 	default Color crusherTilesCorrectColor()
 	{
@@ -286,11 +293,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "endTileCorrectColor",
-			name = "End tile correct color",
-			description = "Configures the color of the end tile highlight when crossing correctly.",
-			position = 22,
-			section = correctCrossingSection
+		keyName = "endTileCorrectColor",
+		name = "End tile correct color",
+		description = "Configures the color of the end tile highlight when crossing correctly.",
+		position = 22,
+		section = correctCrossingSection
 	)
 	default Color endTileCorrectColor()
 	{
@@ -298,11 +305,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "dangerTilesCorrectColor",
-			name = "Danger tiles correct color",
-			description = "Configures the color of the danger tile highlights when crossing correctly.",
-			position = 23,
-			section = correctCrossingSection
+		keyName = "dangerTilesCorrectColor",
+		name = "Danger tiles correct color",
+		description = "Configures the color of the danger tile highlights when crossing correctly.",
+		position = 23,
+		section = correctCrossingSection
 	)
 	default Color dangerTilesCorrectColor()
 	{
@@ -310,11 +317,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "safeTilesCorrectColor",
-			name = "Safe tiles correct color",
-			description = "Configures the color of the safe tile highlights when crossing correctly.",
-			position = 24,
-			section = correctCrossingSection
+		keyName = "safeTilesCorrectColor",
+		name = "Safe tiles correct color",
+		description = "Configures the color of the safe tile highlights when crossing correctly.",
+		position = 24,
+		section = correctCrossingSection
 	)
 	default Color safeTilesCorrectColor()
 	{
@@ -322,11 +329,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "playSoundOnIncorrectCrossing",
-			name = "Play sound on incorrect crossing",
-			description = "Play a sound effect when a mistimed crossing begins.",
-			position = 25,
-			section = incorrectCrossingSection
+		keyName = "playSoundOnIncorrectCrossing",
+		name = "Play sound on incorrect crossing",
+		description = "Play a sound effect when a mistimed crossing begins.",
+		position = 25,
+		section = incorrectCrossingSection
 	)
 	default boolean playSoundOnIncorrectCrossing()
 	{
@@ -334,11 +341,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "incorrectCrossingSoundEffect",
-			name = "Incorrect crossing sound effect",
-			description = "The sound effect to play when a mistimed crossing begins.",
-			position = 26,
-			section = incorrectCrossingSection
+		keyName = "incorrectCrossingSoundEffect",
+		name = "Incorrect crossing sound effect",
+		description = "The sound effect to play when a mistimed crossing begins.",
+		position = 26,
+		section = incorrectCrossingSection
 	)
 	default CrossingSoundEffect incorrectCrossingSoundEffect()
 	{
@@ -346,11 +353,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "changeColorsOnIncorrectCrossing",
-			name = "Change colors on incorrect crossing",
-			description = "Change text and tile colors when a mistimed crossing begins.",
-			position = 27,
-			section = incorrectCrossingSection
+		keyName = "changeColorsOnIncorrectCrossing",
+		name = "Change colors on incorrect crossing",
+		description = "Change text and tile colors when a mistimed crossing begins.",
+		position = 27,
+		section = incorrectCrossingSection
 	)
 	default boolean changeColorsOnIncorrectCrossing()
 	{
@@ -358,11 +365,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "endTileTextIncorrectColor",
-			name = "End tile text incorrect color",
-			description = "Configures the color of the text above the end tile when crossing incorrectly.",
-			position = 28,
-			section = incorrectCrossingSection
+		keyName = "endTileTextIncorrectColor",
+		name = "End tile text incorrect color",
+		description = "Configures the color of the text above the end tile when crossing incorrectly.",
+		position = 28,
+		section = incorrectCrossingSection
 	)
 	default Color endTileTextIncorrectColor()
 	{
@@ -370,11 +377,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "crusherTilesIncorrectColor",
-			name = "Crusher tiles incorrect color",
-			description = "Configures the color of the crusher tile highlights when crossing incorrectly.",
-			position = 29,
-			section = incorrectCrossingSection
+		keyName = "crusherTilesIncorrectColor",
+		name = "Crusher tiles incorrect color",
+		description = "Configures the color of the crusher tile highlights when crossing incorrectly.",
+		position = 29,
+		section = incorrectCrossingSection
 	)
 	default Color crusherTilesIncorrectColor()
 	{
@@ -382,11 +389,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "endTileIncorrectColor",
-			name = "End tile incorrect color",
-			description = "Configures the color of the end tile highlight when crossing incorrectly.",
-			position = 30,
-			section = incorrectCrossingSection
+		keyName = "endTileIncorrectColor",
+		name = "End tile incorrect color",
+		description = "Configures the color of the end tile highlight when crossing incorrectly.",
+		position = 30,
+		section = incorrectCrossingSection
 	)
 	default Color endTileIncorrectColor()
 	{
@@ -394,11 +401,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "dangerTilesIncorrectColor",
-			name = "Danger tiles incorrect color",
-			description = "Configures the color of the danger tile highlights when crossing incorrectly.",
-			position = 31,
-			section = incorrectCrossingSection
+		keyName = "dangerTilesIncorrectColor",
+		name = "Danger tiles incorrect color",
+		description = "Configures the color of the danger tile highlights when crossing incorrectly.",
+		position = 31,
+		section = incorrectCrossingSection
 	)
 	default Color dangerTilesIncorrectColor()
 	{
@@ -406,11 +413,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "safeTilesIncorrectColor",
-			name = "Safe tiles incorrect color",
-			description = "Configures the color of the safe tile highlights when crossing incorrectly.",
-			position = 32,
-			section = incorrectCrossingSection
+		keyName = "safeTilesIncorrectColor",
+		name = "Safe tiles incorrect color",
+		description = "Configures the color of the safe tile highlights when crossing incorrectly.",
+		position = 32,
+		section = incorrectCrossingSection
 	)
 	default Color safeTilesIncorrectColor()
 	{
@@ -418,13 +425,13 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "southRowEscapeAssist",
-			name = "South row escape assist",
-			description = "Highlight the tile you should move to when caught between the south row of crushers." +
-					"<br/>Note directions from the south row may be unreliable if this is switched off." +
-					"<br/>(This doesn't matter if you always manage to cross normally.)",
-			position = 33,
-			section = southRowEscapeSection
+		keyName = "southRowEscapeAssist",
+		name = "South row escape assist",
+		description = "Highlight the tile you should move to when caught between the south row of crushers." +
+				"<br/>Note directions from the south row may be unreliable if this is switched off." +
+				"<br/>(This doesn't matter if you always manage to cross normally.)",
+		position = 33,
+		section = southRowEscapeSection
 	)
 	default boolean southRowEscapeAssist()
 	{
@@ -432,11 +439,12 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "southRowEscapeTileTextSafeColor",
-			name = "South row escape tile text safe color",
-			description = "Configures the color of the text above the south row escape tile when the crushers are not moving.",
-			position = 34,
-			section = southRowEscapeSection
+		keyName = "southRowEscapeTileTextSafeColor",
+		name = "South row escape tile text safe color",
+		description = "Configures the color of the text above the south row escape tile when the crushers are not " +
+				"moving.",
+		position = 34,
+		section = southRowEscapeSection
 	)
 	default Color southRowEscapeTileTextSafeColor()
 	{
@@ -444,11 +452,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "southRowEscapeRowEscapeTileTextDangerColor",
-			name = "South row escape tile text danger color",
-			description = "Configures the color of the text above the south row escape tile when the crushers are moving.",
-			position = 35,
-			section = southRowEscapeSection
+		keyName = "southRowEscapeRowEscapeTileTextDangerColor",
+		name = "South row escape tile text danger color",
+		description = "Configures the color of the text above the south row escape tile when the crushers are moving.",
+		position = 35,
+		section = southRowEscapeSection
 	)
 	default Color southRowEscapeTileTextDangerColor()
 	{
@@ -456,11 +464,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "southRowEscapeTileSafeColor",
-			name = "South row escape tile safe color",
-			description = "Configures the color of the south row escape tile highlight when the crushers are not moving.",
-			position = 36,
-			section = southRowEscapeSection
+		keyName = "southRowEscapeTileSafeColor",
+		name = "South row escape tile safe color",
+		description = "Configures the color of the south row escape tile highlight when the crushers are not moving.",
+		position = 36,
+		section = southRowEscapeSection
 	)
 	default Color southRowEscapeTileSafeColor()
 	{
@@ -468,11 +476,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "southRowEscapeTileDangerColor",
-			name = "South row escape tile danger color",
-			description = "Configures the color of the south row escape tile highlight when the crushers are moving.",
-			position = 37,
-			section = southRowEscapeSection
+		keyName = "southRowEscapeTileDangerColor",
+		name = "South row escape tile danger color",
+		description = "Configures the color of the south row escape tile highlight when the crushers are moving.",
+		position = 37,
+		section = southRowEscapeSection
 	)
 	default Color southRowEscapeTileDangerColor()
 	{
@@ -480,11 +488,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "showTimer",
-			name = "Show timer",
-			description = "Show a graphical timer indicating when the safe-to-click period will end.",
-			position = 38,
-			section = graphicalTimer
+		keyName = "showTimer",
+		name = "Show timer",
+		description = "Show a graphical timer indicating when the safe-to-click period will end.",
+		position = 38,
+		section = graphicalTimerSection
 	)
 	default boolean showTimer()
 	{
@@ -492,11 +500,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "timerLeftColor",
-			name = "Timer left color",
-			description = "Configures the color of the left side of the graphical timer that gradually fills.",
-			position = 39,
-			section = graphicalTimer
+		keyName = "timerLeftColor",
+		name = "Timer left color",
+		description = "Configures the color of the left side of the graphical timer that gradually fills.",
+		position = 39,
+		section = graphicalTimerSection
 	)
 	default Color timerLeftColor()
 	{
@@ -504,11 +512,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "timerRightColor",
-			name = "Timer right color",
-			description = "Configures the color of the right side of the graphical timer that gradually shrinks.",
-			position = 40,
-			section = graphicalTimer
+		keyName = "timerRightColor",
+		name = "Timer right color",
+		description = "Configures the color of the right side of the graphical timer that gradually shrinks.",
+		position = 40,
+		section = graphicalTimerSection
 	)
 	default Color timerRightColor()
 	{
@@ -516,11 +524,11 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "timerFullColor",
-			name = "Timer full color",
-			description = "Configures the color of the graphical timer when it is not safe to cross.",
-			position = 41,
-			section = graphicalTimer
+		keyName = "timerFullColor",
+		name = "Timer full color",
+		description = "Configures the color of the graphical timer when it is not safe to cross.",
+		position = 41,
+		section = graphicalTimerSection
 	)
 	default Color timerFullColor()
 	{
@@ -528,15 +536,56 @@ public interface PenguinCrushersConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "timerBorderColor",
-			name = "Timer border color",
-			description = "Configures the color of the graphical timer's outline." +
-					"<br/>Also controls the color of where the left and right colors meet.",
-			position = 42,
-			section = graphicalTimer
+		keyName = "timerBorderColor",
+		name = "Timer border color",
+		description = "Configures the color of the graphical timer's outline." +
+				"<br/>Also controls the color of where the left and right colors meet.",
+		position = 42,
+		section = graphicalTimerSection
 	)
 	default Color timerBorderColor()
 	{
 		return Color.BLACK;
+	}
+
+	@ConfigItem(
+		keyName = "showBuffer",
+		name = "Show buffer",
+		description = "Show the movement buffer at the end of the graphical timer when it is safe to cross." +
+				"<br/>You generally want to click to move BEFORE the bar reaches this movement buffer.",
+		position = 43,
+		section = graphicalTimerSection
+	)
+	default boolean showBuffer()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "timerBufferColor",
+		name = "Timer buffer color",
+		description = "Configures the color of the movement buffer section of the graphical timer.",
+		position = 44,
+		section = graphicalTimerSection
+	)
+	default Color timerBufferColor()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+		keyName = "movementBufferMs",
+		name = "Movement buffer MS",
+		description = "Estimated milliseconds at the end of a game tick where clicking to move counts for the next " +
+				"tick." +
+				"<br/>Used when calculating if the player's intended movement is blocked by a crusher." +
+				"<br/>Crank this up if you are getting false successes and down if successes aren't triggering when " +
+				"they should.",
+		position = 45,
+		section = advancedSection
+	)
+	default int movementBufferMs()
+	{
+		return 100;
 	}
 }

@@ -455,14 +455,17 @@ public class PenguinCrushersPlugin extends Plugin
 			return destination.equals(escapeTile);  // this will only ever be true if blocked by crushers but that's ok
 		}
 
+		long buffer = config.movementBufferMs();
+		long cap = buffer == 0 ? Long.MAX_VALUE : 1000;
+
 		return location.isInArea(CRUSHER_ZONE)
 				&& !DANGER_TILE_LOCATIONS.contains(destination)
 				&& ((didPlayerJustMove()  // player moving through the crushers with correct timing
 						&& ((DANGER_TILE_LOCATIONS.contains(location) && !isSafeToCross())
 							|| (SAFE_TILE_LOCATIONS.contains(location) && isSafeToCross())))
 					|| (!didPlayerJustMove()  // player blocked by a crusher, which will result in correct timing
-						&& System.currentTimeMillis() - lastDestinationChangeTime >= 100  // let click reach server
-						&& System.currentTimeMillis() - lastDestinationChangeTime < 1000  // check client tick ran first
+						&& System.currentTimeMillis() - lastDestinationChangeTime >= buffer  // let click reach server
+						&& System.currentTimeMillis() - lastDestinationChangeTime < cap  // check client tick ran first
 						&& destination.getX() <= START_TILE_LOCATION.getX()  // don't trigger when you first come down
 						&& lastPlayerLocation != null  // or enter from the north if you're messing around
 						&& !DANGER_TILE_LOCATIONS.contains(location))
